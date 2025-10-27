@@ -18,7 +18,7 @@ import { useCampaignForm } from '../../contexts/CampaignFormContext';
 
 export const GeneralTab: React.FC = () => {
   const { formData, updateFormData } = useCampaignForm();
-  const { control, watch, setValue } = useForm({
+  const { control, watch } = useForm({
     defaultValues: formData.general,
   });
 
@@ -233,34 +233,40 @@ export const GeneralTab: React.FC = () => {
             <Controller
               name="tags"
               control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    fullWidth
-                    placeholder="Ej: digital, social media, promoción"
-                    onChange={(e) => {
-                      const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
-                      field.onChange(tags);
-                    }}
-                  />
-                  <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(field.value && Array.isArray(field.value) ? field.value : []).map((tag: string, index: number) => (
-                      <Chip
-                        key={index}
-                        label={tag}
-                        onDelete={() => {
-                          const currentTags = Array.isArray(field.value) ? field.value : [];
-                          const newTags = currentTags.filter((_, i) => i !== index);
-                          field.onChange(newTags);
-                        }}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                      />
-                    ))}
+              render={({ field }) => {
+                const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
+                  field.onChange(tags);
+                };
+
+                const handleDeleteTag = (indexToDelete: number) => {
+                  const currentTags = Array.isArray(field.value) ? field.value : [];
+                  const newTags = currentTags.filter((_, i) => i !== indexToDelete);
+                  field.onChange(newTags);
+                };
+
+                return (
+                  <Box>
+                    <TextField
+                      fullWidth
+                      placeholder="Ej: digital, social media, promoción"
+                      onChange={handleTagsChange}
+                    />
+                    <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {(field.value && Array.isArray(field.value) ? field.value : []).map((tag: string, index: number) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          onDelete={() => handleDeleteTag(index)}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Box>
                   </Box>
-                </Box>
-              )}
+                );
+              }}
             />
           </Box>
         </Box>
