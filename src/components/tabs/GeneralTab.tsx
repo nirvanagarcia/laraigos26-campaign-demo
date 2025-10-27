@@ -9,8 +9,7 @@ import {
   Select,
   MenuItem,
   Chip,
-  Paper,
-  Stack,
+  Paper
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -46,10 +45,45 @@ export const GeneralTab: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom color="primary">
-          Configuración General de la Campaña
-        </Typography>
+      <Paper 
+        elevation={0} 
+        sx={{ 
+          p: 4,
+          borderRadius: '20px',
+          background: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.3)',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+          <Box sx={{
+            width: 48,
+            height: 48,
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mr: 2,
+            fontSize: '1.5rem'
+          }}>
+            🎯
+          </Box>
+          <Box>
+            <Typography variant="h5" sx={{ 
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              Configuración General
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Define los aspectos fundamentales de tu campaña
+            </Typography>
+          </Box>
+        </Box>
         
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>

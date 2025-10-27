@@ -72,10 +72,45 @@ export const MensajeTab: React.FC = () => {
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom color="primary">
-        Creación de Mensajes y Contenido
-      </Typography>
+    <Paper 
+      elevation={0} 
+      sx={{ 
+        p: 4,
+        borderRadius: '20px',
+        background: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.3)',
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+        <Box sx={{
+          width: 48,
+          height: 48,
+          borderRadius: '16px',
+          background: 'linear-gradient(135deg, #10b981, #34d399)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mr: 2,
+          fontSize: '1.5rem'
+        }}>
+          ✨
+        </Box>
+        <Box>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #10b981, #34d399)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            Mensajes y Contenido
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Crea contenido persuasivo y personalizado para tu audiencia
+          </Typography>
+        </Box>
+      </Box>
       
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Controller
@@ -259,36 +294,106 @@ export const MensajeTab: React.FC = () => {
           />
         </Box>
 
-        <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-          <Typography variant="h6" gutterBottom>
-            Vista Previa del Mensaje
-          </Typography>
+        <Box sx={{ 
+          mt: 4, 
+          p: 3, 
+          borderRadius: '16px',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05))',
+          border: '1px solid rgba(102, 126, 234, 0.1)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <Box sx={{
+              width: 32,
+              height: 32,
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 2,
+              fontSize: '1rem'
+            }}>
+              👁️
+            </Box>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Vista Previa del Mensaje
+            </Typography>
+          </Box>
           
-          <Box sx={{ p: 2, bgcolor: 'white', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
-            <Typography variant="h6" sx={{ mb: 1, color: 'primary.main' }}>
-              {watchedValues.title || 'Título del mensaje...'}
+          <Box sx={{ 
+            p: 3, 
+            background: 'linear-gradient(135deg, #ffffff, #f8fafc)',
+            borderRadius: '16px', 
+            border: '1px solid rgba(255,255,255,0.5)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          }}>
+            <Typography variant="h5" sx={{ 
+              mb: 2, 
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              {watchedValues.title || '✨ Título del mensaje...'}
             </Typography>
             
-            <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
-              {watchedValues.content || 'Contenido del mensaje...'}
+            <Typography variant="body1" sx={{ 
+              mb: 3, 
+              whiteSpace: 'pre-wrap',
+              lineHeight: 1.7,
+              color: 'text.primary'
+            }}>
+              {watchedValues.content || '📝 Contenido del mensaje...'}
             </Typography>
             
             {watchedValues.callToAction && (
-              <Button variant="contained" color="primary" disabled>
-                {watchedValues.callToAction}
+              <Button 
+                variant="contained" 
+                disabled
+                sx={{
+                  background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+                  color: 'white',
+                  fontWeight: 600,
+                  borderRadius: '12px',
+                  px: 3,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                }}
+              >
+                🚀 {watchedValues.callToAction}
               </Button>
             )}
             
-            <Box sx={{ mt: 2, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              <Typography variant="caption" color="text.secondary">
-                Tono: {toneOptions.find(t => t.value === watchedValues.tone)?.label || 'No seleccionado'}
-              </Typography>
+            <Box sx={{ 
+              mt: 3, 
+              pt: 2, 
+              borderTop: '1px solid rgba(0,0,0,0.05)', 
+              display: 'flex', 
+              gap: 2, 
+              flexWrap: 'wrap',
+              alignItems: 'center'
+            }}>
+              <Chip
+                label={`🎨 ${toneOptions.find(t => t.value === watchedValues.tone)?.label || 'No seleccionado'}`}
+                size="small"
+                sx={{
+                  background: 'linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))',
+                  color: '#667eea',
+                  fontWeight: 600,
+                }}
+              />
               {watchedValues.channels && watchedValues.channels.length > 0 && (
-                <>
-                  <Typography variant="caption" color="text.secondary">
-                    • Canales: {watchedValues.channels.join(', ')}
-                  </Typography>
-                </>
+                <Chip
+                  label={`📡 ${watchedValues.channels.length} canal${watchedValues.channels.length > 1 ? 'es' : ''}`}
+                  size="small"
+                  sx={{
+                    background: 'linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1))',
+                    color: '#10b981',
+                    fontWeight: 600,
+                  }}
+                />
               )}
             </Box>
           </Box>

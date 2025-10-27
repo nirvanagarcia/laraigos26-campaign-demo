@@ -4,14 +4,18 @@ import type { CampaignData, CampaignFormContextType } from '../types/campaign';
 
 const initialCampaignData: CampaignData = {
   general: {
-    name: '',
-    description: '',
-    startDate: null,
-    endDate: null,
-    budget: 0,
-    category: '',
-    priority: 'medium',
-    tags: [],
+    titulo: '',
+    descripcion: '',
+    fechaInicio: null,
+    fechaFin: null,
+    fuente: 'EXTERNA',
+    tipoEjecucion: 'MANUAL',
+    fechaProgramacion: null,
+    horaProgramacion: '',
+    grupo: '',
+    canal: '',
+    tipoMensaje: 'HSM',
+    plantillaComunicacion: '',
   },
   personas: {
     targetAudience: '',
@@ -66,8 +70,10 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
 
   // Simple validation logic
   const isValid = Boolean(
-    formData.general.name &&
-    formData.general.description &&
+    formData.general.titulo &&
+    formData.general.descripcion &&
+    formData.general.fuente &&
+    formData.general.tipoEjecucion &&
     formData.mensaje.title &&
     formData.mensaje.content
   );

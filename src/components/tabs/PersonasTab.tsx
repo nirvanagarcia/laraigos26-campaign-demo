@@ -64,10 +64,45 @@ export const PersonasTab: React.FC = () => {
   ];
 
   return (
-    <Paper elevation={2} sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom color="primary">
-        Definición de Audiencia y Personas
-      </Typography>
+    <Paper 
+      elevation={0} 
+      sx={{ 
+        p: 4,
+        borderRadius: '20px',
+        background: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.3)',
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+        <Box sx={{
+          width: 48,
+          height: 48,
+          borderRadius: '16px',
+          background: 'linear-gradient(135deg, #f093fb, #f5576c)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mr: 2,
+          fontSize: '1.5rem'
+        }}>
+          🎭
+        </Box>
+        <Box>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            Audiencia y Personas
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Define tu audiencia objetivo y características demográficas
+          </Typography>
+        </Box>
+      </Box>
       
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Controller

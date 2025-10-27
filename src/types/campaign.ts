@@ -1,14 +1,18 @@
 export interface CampaignData {
   // General tab data
   general: {
-    name: string;
-    description: string;
-    startDate: Date | null;
-    endDate: Date | null;
-    budget: number;
-    category: string;
-    priority: 'low' | 'medium' | 'high';
-    tags: string[];
+    titulo: string;
+    descripcion: string;
+    fechaInicio: Date | null;
+    fechaFin: Date | null;
+    fuente: 'INTERNA' | 'EXTERNA' | 'OPORTUNIDADES';
+    tipoEjecucion: 'MANUAL' | 'PROGRAMADA';
+    fechaProgramacion?: Date | null;
+    horaProgramacion?: string;
+    grupo: string;
+    canal: string;
+    tipoMensaje: 'HSM' | 'CORREO' | 'SMS';
+    plantillaComunicacion: string;
   };
   
   // Personas tab data

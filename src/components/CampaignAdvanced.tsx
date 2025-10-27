@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { CampaignFormProvider, useCampaignForm } from '../contexts/CampaignFormContext';
 import { TabPanel, a11yProps } from './TabPanel';
-import { GeneralTab } from './tabs/GeneralTab';
+import { GeneralTab } from './tabs/GeneralTabNew';
 import { PersonasTab } from './tabs/PersonasTab';
 import { MensajeTab } from './tabs/MensajeTab';
 
@@ -44,29 +44,84 @@ const CampaignTabsContent: React.FC = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" elevation={0} sx={{ bgcolor: 'primary.main', mb: 3 }}>
-        <Toolbar>
-          <CampaignIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Campañas Avanzadas
-          </Typography>
+    <Box sx={{ 
+      flexGrow: 1, 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      minHeight: '100vh'
+    }}>
+      <AppBar 
+        position="static" 
+        elevation={0} 
+        sx={{ 
+          background: 'transparent',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          mb: 4
+        }}
+      >
+        <Toolbar sx={{ py: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '50px',
+            px: 2,
+            py: 1,
+            mr: 3
+          }}>
+            <CampaignIcon sx={{ mr: 1, color: 'white' }} />
+            <Typography variant="h5" component="div" sx={{ 
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #ffffff, #f0f0f0)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              Campañas Avanzadas
+            </Typography>
+          </Box>
+          
+          <Box sx={{ flexGrow: 1 }} />
+          
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Button
-              color="inherit"
               startIcon={<RefreshIcon />}
               onClick={handleReset}
               variant="outlined"
+              sx={{
+                color: 'white',
+                borderColor: 'rgba(255,255,255,0.3)',
+                background: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+                '&:hover': {
+                  borderColor: 'rgba(255,255,255,0.5)',
+                  background: 'rgba(255,255,255,0.2)',
+                }
+              }}
             >
               Limpiar
             </Button>
             <Button
-              color="inherit"
               startIcon={<SaveIcon />}
               onClick={handleSave}
               variant="contained"
-              sx={{ bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }}
               disabled={!isValid}
+              sx={{
+                background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+                color: 'white',
+                fontWeight: 600,
+                px: 4,
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #ec69f8, #f34f63)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 10px 20px rgba(240, 147, 251, 0.4)',
+                },
+                '&:disabled': {
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'rgba(255,255,255,0.5)',
+                },
+                transition: 'all 0.3s ease',
+              }}
             >
               Guardar Campaña
             </Button>
@@ -75,18 +130,62 @@ const CampaignTabsContent: React.FC = () => {
       </AppBar>
 
       <Container maxWidth="lg">
-        <Paper elevation={1} sx={{ mb: 3 }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            mb: 4,
+            borderRadius: '24px',
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            overflow: 'hidden'
+          }}
+        >
           <Tabs 
             value={activeTab} 
             onChange={handleTabChange} 
             aria-label="campaign tabs"
             variant="fullWidth"
-            indicatorColor="primary"
-            textColor="primary"
+            sx={{
+              '& .MuiTabs-indicator': {
+                height: 4,
+                borderRadius: '2px 2px 0 0',
+                background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              },
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                py: 3,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(102, 126, 234, 0.05)',
+                },
+                '&.Mui-selected': {
+                  color: '#667eea',
+                  fontWeight: 700,
+                },
+              },
+            }}
           >
-            <Tab label="General" {...a11yProps(0)} />
-            <Tab label="Personas" {...a11yProps(1)} />
-            <Tab label="Mensaje" {...a11yProps(2)} />
+            <Tab 
+              label="📋 General" 
+              {...a11yProps(0)}
+              icon={<Box sx={{ fontSize: '1.2rem' }}>🎯</Box>}
+              iconPosition="start"
+            />
+            <Tab 
+              label="👥 Personas" 
+              {...a11yProps(1)}
+              icon={<Box sx={{ fontSize: '1.2rem' }}>🎭</Box>}
+              iconPosition="start"
+            />
+            <Tab 
+              label="💬 Mensaje" 
+              {...a11yProps(2)}
+              icon={<Box sx={{ fontSize: '1.2rem' }}>✨</Box>}
+              iconPosition="start"
+            />
           </Tabs>
         </Paper>
 
@@ -103,24 +202,55 @@ const CampaignTabsContent: React.FC = () => {
         </TabPanel>
 
         {/* Debug Panel - Solo para desarrollo */}
-        <Paper elevation={2} sx={{ mt: 4, p: 2, bgcolor: 'grey.50' }}>
-          <Typography variant="h6" gutterBottom>
-            Estado del Formulario (Debug)
-          </Typography>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            mt: 4, 
+            p: 3, 
+            borderRadius: '20px',
+            background: 'rgba(255,255,255,0.9)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.3)',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ 
+              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 700,
+              mr: 2
+            }}>
+              🔍 Estado del Formulario (Debug)
+            </Typography>
+            <Box sx={{
+              px: 2,
+              py: 0.5,
+              borderRadius: '20px',
+              background: isValid 
+                ? 'linear-gradient(45deg, #10b981, #34d399)' 
+                : 'linear-gradient(45deg, #ef4444, #f87171)',
+              color: 'white',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}>
+              {isValid ? '✅ Válido' : '⚠️ Incompleto'}
+            </Box>
+          </Box>
+          
           <Typography variant="body2" component="pre" sx={{ 
             fontSize: '0.75rem', 
             overflow: 'auto',
             maxHeight: 200,
-            bgcolor: 'white',
-            p: 1,
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'grey.300'
+            background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+            p: 2,
+            borderRadius: '12px',
+            border: '1px solid rgba(102, 126, 234, 0.1)',
+            fontFamily: '"Fira Code", "Monaco", monospace',
+            lineHeight: 1.4,
           }}>
             {JSON.stringify(formData, null, 2)}
-          </Typography>
-          <Typography variant="caption" color={isValid ? 'success.main' : 'error.main'}>
-            Formulario {isValid ? 'válido' : 'incompleto'}
           </Typography>
         </Paper>
       </Container>
