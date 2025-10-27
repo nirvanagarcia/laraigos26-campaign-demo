@@ -13,6 +13,14 @@ export interface CampaignData {
     canal: string;
     tipoMensaje: 'HSM' | 'CORREO' | 'SMS';
     plantillaComunicacion: string;
+    // Nuevos campos para compatibilidad
+    name?: string;
+    category?: string;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    budget?: number;
+    priority?: string;
+    tags?: string[];
   };
   
   // Personas tab data

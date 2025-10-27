@@ -18,7 +18,7 @@ import { useCampaignForm } from '../../contexts/CampaignFormContext';
 
 export const GeneralTab: React.FC = () => {
   const { formData, updateFormData } = useCampaignForm();
-  const { control, watch } = useForm({
+  const { control, watch, setValue } = useForm({
     defaultValues: formData.general,
   });
 
@@ -95,6 +95,7 @@ export const GeneralTab: React.FC = () => {
                 render={({ field, fieldState }) => (
                   <TextField
                     {...field}
+                    value={field.value || ''}
                     fullWidth
                     label="Nombre de la Campaña"
                     variant="outlined"
@@ -112,7 +113,7 @@ export const GeneralTab: React.FC = () => {
                 render={({ field }) => (
                   <FormControl fullWidth>
                     <InputLabel>Categoría</InputLabel>
-                    <Select {...field} label="Categoría">
+                    <Select {...field} value={field.value || ''} label="Categoría">
                       {categories.map((category) => (
                         <MenuItem key={category} value={category}>
                           {category}
@@ -126,12 +127,13 @@ export const GeneralTab: React.FC = () => {
           </Box>
 
           <Controller
-            name="description"
+            name="descripcion"
             control={control}
             rules={{ required: 'La descripción es requerida' }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
+                value={field.value || ''}
                 fullWidth
                 multiline
                 rows={4}
@@ -151,8 +153,8 @@ export const GeneralTab: React.FC = () => {
                 render={({ field }) => (
                   <DatePicker
                     label="Fecha de Inicio"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={field.value || null}
+                    onChange={(newValue) => field.onChange(newValue)}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -171,8 +173,8 @@ export const GeneralTab: React.FC = () => {
                 render={({ field }) => (
                   <DatePicker
                     label="Fecha de Fin"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={field.value || null}
+                    onChange={(newValue) => field.onChange(newValue)}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -193,6 +195,7 @@ export const GeneralTab: React.FC = () => {
                 render={({ field }) => (
                   <TextField
                     {...field}
+                    value={field.value || ''}
                     fullWidth
                     type="number"
                     label="Presupuesto (€)"
@@ -212,7 +215,7 @@ export const GeneralTab: React.FC = () => {
                 render={({ field }) => (
                   <FormControl fullWidth>
                     <InputLabel>Prioridad</InputLabel>
-                    <Select {...field} label="Prioridad">
+                    <Select {...field} value={field.value || 'medium'} label="Prioridad">
                       {priorities.map((priority) => (
                         <MenuItem key={priority.value} value={priority.value}>
                           {priority.label}
@@ -241,12 +244,13 @@ export const GeneralTab: React.FC = () => {
                     }}
                   />
                   <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {field.value.map((tag, index) => (
+                    {(field.value && Array.isArray(field.value) ? field.value : []).map((tag: string, index: number) => (
                       <Chip
                         key={index}
                         label={tag}
                         onDelete={() => {
-                          const newTags = field.value.filter((_, i) => i !== index);
+                          const currentTags = Array.isArray(field.value) ? field.value : [];
+                          const newTags = currentTags.filter((_, i) => i !== index);
                           field.onChange(newTags);
                         }}
                         size="small"

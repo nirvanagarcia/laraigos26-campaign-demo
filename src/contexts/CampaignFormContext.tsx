@@ -16,6 +16,14 @@ const initialCampaignData: CampaignData = {
     canal: '',
     tipoMensaje: 'HSM',
     plantillaComunicacion: '',
+    // Nuevos campos
+    name: '',
+    category: '',
+    startDate: null,
+    endDate: null,
+    budget: 0,
+    priority: 'medium',
+    tags: [],
   },
   personas: {
     targetAudience: '',
