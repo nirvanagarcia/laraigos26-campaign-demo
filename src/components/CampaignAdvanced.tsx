@@ -11,11 +11,13 @@ import {
   Paper,
   Alert,
   Snackbar,
+  Badge,
 } from '@mui/material';
 import {
   Campaign as CampaignIcon,
   Save as SaveIcon,
   Refresh as RefreshIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
 import { CampaignFormProvider, useCampaignForm } from '../contexts/CampaignFormContext';
 import { TabPanel, a11yProps } from './TabPanel';
@@ -26,21 +28,58 @@ import { MensajeTab } from './tabs/MensajeTab';
 const CampaignTabsContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
-  const { formData, resetForm, isValid } = useCampaignForm();
+  const { formData, resetForm, isValid, errors, validateForm, validateTab, showErrors } = useCampaignForm();
+
+  const getTabName = (tabIndex: number): string => {
+    const tabNames = ['general', 'personas', 'mensaje'];
+    return tabNames[tabIndex] || 'general';
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    const currentTabName = getTabName(activeTab);
+    
+    // Solo validar si no es el primer tab o si ya hemos empezado a validar
+    if (activeTab > 0 || formData.general.titulo || formData.general.descripcion || Object.values(formData.general).some(value => value && value !== '')) {
+      // Intentar validar el tab actual antes de cambiar
+      const isCurrentTabValid = validateTab(currentTabName);
+      
+      // Si el tab actual no es válido, mostrar un mensaje pero permitir el cambio
+      if (!isCurrentTabValid) {
+        console.log(`Tab ${currentTabName} tiene errores, pero permitiendo el cambio`);
+      }
+    }
+    
     setActiveTab(newValue);
   };
 
   const handleSave = () => {
-    console.log('Guardando campaña:', formData);
-    setShowAlert(true);
+    if (validateForm()) {
+      console.log('Guardando campaña:', formData);
+      setShowAlert(true);
+    } else {
+      console.log('Formulario inválido:', errors);
+      // Opcional: mostrar un alert de error
+    }
   };
 
   const handleReset = () => {
     resetForm();
     setActiveTab(0);
   };
+
+  // Contar errores por tab
+  const getTabErrors = () => {
+    const generalErrors = Object.keys(errors.general || {}).length;
+    const personasErrors = Object.keys(errors.personas || {}).length;
+    
+    return {
+      general: generalErrors,
+      personas: personasErrors,
+      mensaje: 0, // Por ahora no hay validaciones en mensaje
+    };
+  };
+
+  const tabErrors = getTabErrors();
 
   return (
     <Box sx={{ 
@@ -106,14 +145,18 @@ const CampaignTabsContent: React.FC = () => {
               variant="contained"
               disabled={!isValid}
               sx={{
-                background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+                background: isValid 
+                  ? 'linear-gradient(45deg, #f093fb, #f5576c)'
+                  : 'rgba(255,255,255,0.2)',
                 color: 'white',
                 fontWeight: 600,
                 px: 4,
                 '&:hover': {
-                  background: 'linear-gradient(45deg, #ec69f8, #f34f63)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 10px 20px rgba(240, 147, 251, 0.4)',
+                  background: isValid 
+                    ? 'linear-gradient(45deg, #ec69f8, #f34f63)'
+                    : 'rgba(255,255,255,0.2)',
+                  transform: isValid ? 'translateY(-2px)' : 'none',
+                  boxShadow: isValid ? '0 10px 20px rgba(240, 147, 251, 0.4)' : 'none',
                 },
                 '&:disabled': {
                   background: 'rgba(255,255,255,0.2)',
@@ -128,7 +171,7 @@ const CampaignTabsContent: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl">
+      <Container maxWidth="false">
         <Paper 
           elevation={0} 
           sx={{ 
@@ -168,19 +211,43 @@ const CampaignTabsContent: React.FC = () => {
             }}
           >
             <Tab 
-              label="📋 General" 
+              label={
+                <Badge 
+                  badgeContent={tabErrors.general} 
+                  color="error" 
+                  invisible={tabErrors.general === 0}
+                >
+                  📋 General
+                </Badge>
+              }
               {...a11yProps(0)}
               icon={<Box sx={{ fontSize: '1.2rem' }}>🎯</Box>}
               iconPosition="start"
             />
             <Tab 
-              label="👥 Personas" 
+              label={
+                <Badge 
+                  badgeContent={tabErrors.personas} 
+                  color="error" 
+                  invisible={tabErrors.personas === 0}
+                >
+                  👥 Personas
+                </Badge>
+              }
               {...a11yProps(1)}
               icon={<Box sx={{ fontSize: '1.2rem' }}>🎭</Box>}
               iconPosition="start"
             />
             <Tab 
-              label="💬 Mensaje" 
+              label={
+                <Badge 
+                  badgeContent={tabErrors.mensaje} 
+                  color="error" 
+                  invisible={tabErrors.mensaje === 0}
+                >
+                  💬 Mensaje
+                </Badge>
+              }
               {...a11yProps(2)}
               icon={<Box sx={{ fontSize: '1.2rem' }}>✨</Box>}
               iconPosition="start"
@@ -199,6 +266,79 @@ const CampaignTabsContent: React.FC = () => {
         <TabPanel value={activeTab} index={2}>
           <MensajeTab />
         </TabPanel>
+
+        {/* Panel de errores de validación */}
+        {showErrors && !isValid && (
+          <Paper 
+            elevation={0} 
+            sx={{ 
+              mt: 4, 
+              p: 3, 
+              borderRadius: '20px',
+              background: 'rgba(255,255,255,0.9)',
+              backdropFilter: 'blur(20px)',
+              border: '2px solid rgba(239, 68, 68, 0.2)',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <ErrorIcon sx={{ color: '#ef4444', mr: 1 }} />
+              <Typography variant="h6" sx={{ 
+                color: '#ef4444',
+                fontWeight: 700,
+              }}>
+                ⚠️ Campos Requeridos Faltantes
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {/* Errores del tab General */}
+              {Object.keys(errors.general || {}).length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: '#ef4444' }}>
+                    📋 Tab General:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {Object.entries(errors.general || {}).map(([field, message]) => (
+                      <Alert 
+                        key={field}
+                        severity="error" 
+                        sx={{ 
+                          borderRadius: '8px',
+                          fontSize: '0.8rem',
+                        }}
+                      >
+                        {message}
+                      </Alert>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {/* Errores del tab Personas */}
+              {Object.keys(errors.personas || {}).length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: '#ef4444' }}>
+                    👥 Tab Personas:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {Object.entries(errors.personas || {}).map(([field, message]) => (
+                      <Alert 
+                        key={field}
+                        severity="error" 
+                        sx={{ 
+                          borderRadius: '8px',
+                          fontSize: '0.8rem',
+                        }}
+                      >
+                        {message}
+                      </Alert>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Paper>
+        )}
 
         <Paper 
           elevation={0} 
@@ -255,12 +395,21 @@ const CampaignTabsContent: React.FC = () => {
 
       <Snackbar
         open={showAlert}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={() => setShowAlert(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setShowAlert(false)} severity="success" sx={{ width: '100%' }}>
-          ¡Campaña guardada exitosamente!
+        <Alert 
+          onClose={() => setShowAlert(false)} 
+          severity="success" 
+          sx={{ 
+            width: '100%',
+            borderRadius: '12px',
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          ✅ ¡Campaña guardada exitosamente!
         </Alert>
       </Snackbar>
     </Box>

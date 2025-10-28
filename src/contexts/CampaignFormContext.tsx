@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import type { CampaignData, CampaignFormContextType } from '../types/campaign';
+import type { CampaignData, CampaignFormContextType, CampaignValidationErrors } from '../types/campaign';
 
 const initialCampaignData: CampaignData = {
   general: {
@@ -33,6 +33,7 @@ const initialCampaignData: CampaignData = {
     },
     segmentation: [],
     estimatedReach: 0,
+    hasExcelFile: false,
   },
   mensaje: {
     title: '',
@@ -60,6 +61,8 @@ interface CampaignFormProviderProps {
 
 export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ children }) => {
   const [formData, setFormData] = useState<CampaignData>(initialCampaignData);
+  const [validatedTabs, setValidatedTabs] = useState<Set<string>>(new Set());
+  const [attemptedSave, setAttemptedSave] = useState(false);
 
   const updateFormData = useCallback((section: keyof CampaignData, data: any) => {
     setFormData(prev => ({
@@ -73,16 +76,132 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
 
   const resetForm = useCallback(() => {
     setFormData(initialCampaignData);
+    setValidatedTabs(new Set());
+    setAttemptedSave(false);
   }, []);
 
-  const isValid = Boolean(
-    formData.general.titulo &&
-    formData.general.descripcion &&
-    formData.general.fuente &&
-    formData.general.tipoEjecucion &&
-    formData.mensaje.title &&
-    formData.mensaje.content
-  );
+  // Función para validar un tab específico
+  const validateTab = useCallback((tabName: string): boolean => {
+    setValidatedTabs(prev => new Set(prev).add(tabName));
+    
+    const tabErrors = getTabValidationErrors(tabName);
+    return Object.keys(tabErrors).length === 0;
+  }, [formData]);
+
+  // Función auxiliar para obtener errores de un tab específico
+  const getTabValidationErrors = useCallback((tabName: string) => {
+    const tabErrors: any = {};
+
+    if (tabName === 'general') {
+      if (!formData.general.titulo?.trim()) {
+        tabErrors.titulo = 'El título es requerido';
+      }
+      if (!formData.general.descripcion?.trim()) {
+        tabErrors.descripcion = 'La descripción es requerida';
+      }
+      if (!formData.general.fechaInicio) {
+        tabErrors.fechaInicio = 'La fecha de inicio es requerida';
+      }
+      if (!formData.general.fechaFin) {
+        tabErrors.fechaFin = 'La fecha de fin es requerida';
+      }
+      if (!formData.general.fuente) {
+        tabErrors.fuente = 'La fuente es requerida';
+      }
+      if (!formData.general.tipoEjecucion) {
+        tabErrors.tipoEjecucion = 'El tipo de ejecución es requerido';
+      }
+      if (formData.general.tipoEjecucion === 'PROGRAMADA') {
+        if (!formData.general.fechaProgramacion) {
+          tabErrors.fechaProgramacion = 'La fecha de programación es requerida';
+        }
+        if (!formData.general.horaProgramacion?.trim()) {
+          tabErrors.horaProgramacion = 'La hora de programación es requerida';
+        }
+      }
+      if (!formData.general.grupo) {
+        tabErrors.grupo = 'El grupo es requerido';
+      }
+      if (!formData.general.canal) {
+        tabErrors.canal = 'El canal es requerido';
+      }
+      if (!formData.general.tipoMensaje) {
+        tabErrors.tipoMensaje = 'El tipo de mensaje es requerido';
+      }
+      if (!formData.general.plantillaComunicacion) {
+        tabErrors.plantillaComunicacion = 'La plantilla de comunicación es requerida';
+      }
+    }
+
+    if (tabName === 'personas') {
+      if (formData.general.fuente === 'EXTERNA' && !formData.personas.hasExcelFile) {
+        tabErrors.hasExcelFile = 'Debe cargar un archivo Excel cuando la fuente es Externa';
+      }
+    }
+
+    return tabErrors;
+  }, [formData]);
+
+  // Validación completa del formulario
+  const errors = useMemo((): CampaignValidationErrors => {
+    const validationErrors: CampaignValidationErrors = {
+      general: {},
+      personas: {},
+    };
+
+    // Solo mostrar errores si se ha intentado guardar o si el tab ha sido validado
+    if (attemptedSave || validatedTabs.has('general')) {
+      validationErrors.general = getTabValidationErrors('general');
+    }
+
+    if (attemptedSave || validatedTabs.has('personas')) {
+      validationErrors.personas = getTabValidationErrors('personas');
+    }
+
+    return validationErrors;
+  }, [formData, validatedTabs, attemptedSave, getTabValidationErrors]);
+
+  const validateForm = useCallback((): boolean => {
+    // Marcar que se intentó guardar
+    setAttemptedSave(true);
+    
+    // Validar todos los tabs
+    setValidatedTabs(new Set(['general', 'personas', 'mensaje']));
+    
+    const generalErrors = getTabValidationErrors('general');
+    const personasErrors = getTabValidationErrors('personas');
+    
+    const hasGeneralErrors = Object.keys(generalErrors).length > 0;
+    const hasPersonasErrors = Object.keys(personasErrors).length > 0;
+    
+    return !hasGeneralErrors && !hasPersonasErrors;
+  }, [getTabValidationErrors]);
+
+  const isValid = useMemo(() => {
+    // Solo considerar válido si no hay errores en los tabs validados
+    const generalErrors = validatedTabs.has('general') || attemptedSave 
+      ? getTabValidationErrors('general') 
+      : {};
+    const personasErrors = validatedTabs.has('personas') || attemptedSave 
+      ? getTabValidationErrors('personas') 
+      : {};
+    
+    const hasGeneralErrors = Object.keys(generalErrors).length > 0;
+    const hasPersonasErrors = Object.keys(personasErrors).length > 0;
+    
+    return !hasGeneralErrors && !hasPersonasErrors;
+  }, [formData, validatedTabs, attemptedSave, getTabValidationErrors]);
+
+  // Determinar si mostrar errores
+  const showErrors = attemptedSave || validatedTabs.size > 0;
+
+  // Para el botón de guardar, verificar si el formulario está completo (independiente de showErrors)
+  const isFormComplete = useMemo(() => {
+    const allGeneralErrors = getTabValidationErrors('general');
+    const allPersonasErrors = getTabValidationErrors('personas');
+    
+    return Object.keys(allGeneralErrors).length === 0 && Object.keys(allPersonasErrors).length === 0;
+  }, [formData, getTabValidationErrors]);
 
   return (
     <CampaignFormContext.Provider
@@ -90,7 +209,13 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
         formData,
         updateFormData,
         resetForm,
-        isValid,
+        isValid: isFormComplete, // Cambiar para usar isFormComplete en lugar de isValid
+        errors,
+        validateForm,
+        showErrors,
+        validatedTabs,
+        validateTab,
+        attemptedSave,
       }}
     >
       {children}

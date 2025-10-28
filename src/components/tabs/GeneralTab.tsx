@@ -12,6 +12,7 @@ import {
   Card,
   CardContent,
   Chip,
+  FormHelperText,
 } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -23,7 +24,7 @@ import { MessagePreview } from '../previews';
 import type { PlantillaComunicacion } from '../../types/mockData';
 
 export const GeneralTab: React.FC = () => {
-  const { formData, updateFormData } = useCampaignForm();
+  const { formData, updateFormData, errors, showErrors } = useCampaignForm();
   const { control, watch, setValue } = useForm({
     defaultValues: formData.general,
   });
@@ -53,7 +54,6 @@ export const GeneralTab: React.FC = () => {
 
   const tiposMensajeSoportados = useMemo(() => {
     if (!watchedValues.canal) return [];
-    
     const canalSeleccionado = mockCanales.find(c => c.id === watchedValues.canal);
     return canalSeleccionado?.tiposSoportados || [];
   }, [watchedValues.canal]);
@@ -169,21 +169,22 @@ export const GeneralTab: React.FC = () => {
               width: '100%',
               maxWidth: '100%',
               overflow: 'hidden',
+              paddingTop: 1
             }}
           >
             <Controller
               name="titulo"
               control={control}
               rules={{ required: 'El título es requerido' }}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
                   label="Título"
                   placeholder="Asigna un nombre a tu campaña"
                   variant="outlined"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  error={showErrors && !!errors.general?.titulo}
+                  helperText={showErrors ? errors.general?.titulo : undefined}
                   sx={{
                     maxWidth: '100%',
                     '& .MuiOutlinedInput-root': {
@@ -198,7 +199,7 @@ export const GeneralTab: React.FC = () => {
               name="descripcion"
               control={control}
               rules={{ required: 'La descripción es requerida' }}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
@@ -207,8 +208,8 @@ export const GeneralTab: React.FC = () => {
                   label="Descripción"
                   placeholder="Asigna una breve descripción del uso de tu campaña"
                   variant="outlined"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  error={showErrors && !!errors.general?.descripcion}
+                  helperText={showErrors ? errors.general?.descripcion : undefined}
                   sx={{
                     maxWidth: '100%',
                     '& .MuiOutlinedInput-root': {
@@ -233,7 +234,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          helperText: "Selecciona la fecha inicio de vigencia de tu campaña",
+                          error: showErrors && !!errors.general?.fechaInicio,
+                          helperText: showErrors && errors.general?.fechaInicio ? errors.general.fechaInicio : "Selecciona la fecha inicio de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -255,7 +257,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          helperText: "Selecciona la fecha fin de vigencia de tu campaña",
+                          error: showErrors && !!errors.general?.fechaFin,
+                          helperText: showErrors && errors.general?.fechaFin ? errors.general.fechaFin : "Selecciona la fecha fin de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -271,7 +274,7 @@ export const GeneralTab: React.FC = () => {
                   name="fuente"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }} error={showErrors && !!errors.general?.fuente}>
                       <InputLabel>Fuente</InputLabel>
                       <Select {...field} label="Fuente">
                         {fuenteOptions.map((option) => (
@@ -283,9 +286,14 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        Elige la fuente de origen de datos con la cual se completará a los destinatarios de tu campaña
-                      </Typography>
+                      {showErrors && errors.general?.fuente && (
+                        <FormHelperText>{errors.general.fuente}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.fuente) && (
+                        <FormHelperText>
+                          Elige la fuente de origen de datos con la cual se completará a los destinatarios de tu campaña
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -296,7 +304,7 @@ export const GeneralTab: React.FC = () => {
                   name="tipoEjecucion"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }} error={showErrors && !!errors.general?.tipoEjecucion}>
                       <InputLabel>Tipo de ejecución</InputLabel>
                       <Select {...field} label="Tipo de ejecución">
                         {tipoEjecucionOptions.map((option) => (
@@ -308,9 +316,14 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        Define la programación de ejecución de tu campaña
-                      </Typography>
+                      {showErrors && errors.general?.tipoEjecucion && (
+                        <FormHelperText>{errors.general.tipoEjecucion}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.tipoEjecucion) && (
+                        <FormHelperText>
+                          Define la programación de ejecución de tu campaña
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -342,6 +355,8 @@ export const GeneralTab: React.FC = () => {
                             textField: {
                               fullWidth: true,
                               variant: "outlined",
+                              error: showErrors && !!errors.general?.fechaProgramacion,
+                              helperText: showErrors ? errors.general?.fechaProgramacion : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -374,6 +389,8 @@ export const GeneralTab: React.FC = () => {
                             textField: {
                               fullWidth: true,
                               variant: "outlined",
+                              error: showErrors && !!errors.general?.horaProgramacion,
+                              helperText: showErrors ? errors.general?.horaProgramacion : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -391,7 +408,7 @@ export const GeneralTab: React.FC = () => {
                   name="grupo"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }} error={showErrors && !!errors.general?.grupo}>
                       <InputLabel>Grupo</InputLabel>
                       <Select {...field} label="Grupo">
                         {mockGrupos.map((grupo) => (
@@ -425,9 +442,14 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        Asigna un grupo de atención de asesores a tu campaña
-                      </Typography>
+                      {showErrors && errors.general?.grupo && (
+                        <FormHelperText>{errors.general.grupo}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.grupo) && (
+                        <FormHelperText>
+                          Asigna un grupo de atención de asesores a tu campaña
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -438,7 +460,7 @@ export const GeneralTab: React.FC = () => {
                   name="canal"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }} error={showErrors && !!errors.general?.canal}>
                       <InputLabel>Canal</InputLabel>
                       <Select {...field} label="Canal">
                         {mockCanales.filter(c => c.activo).map((canal) => (
@@ -472,9 +494,14 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        Selecciona el canal de envío de tu campaña
-                      </Typography>
+                      {showErrors && errors.general?.canal && (
+                        <FormHelperText>{errors.general.canal}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.canal) && (
+                        <FormHelperText>
+                          Selecciona el canal de envío de tu campaña
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -491,6 +518,7 @@ export const GeneralTab: React.FC = () => {
                       fullWidth 
                       disabled={tiposMensajeSoportados.length === 0}
                       sx={{ maxWidth: '100%' }}
+                      error={showErrors && !!errors.general?.tipoMensaje}
                     >
                       <InputLabel>Tipo de Mensaje</InputLabel>
                       <Select 
@@ -511,12 +539,17 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        {tiposMensajeSoportados.length === 0 
-                          ? 'Primero selecciona un canal'
-                          : `Tipos disponibles para el canal seleccionado: ${tiposMensajeSoportados.join(', ')}`
-                        }
-                      </Typography>
+                      {showErrors && errors.general?.tipoMensaje && (
+                        <FormHelperText>{errors.general.tipoMensaje}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.tipoMensaje) && (
+                        <FormHelperText>
+                          {tiposMensajeSoportados.length === 0 
+                            ? 'Primero selecciona un canal'
+                            : `Tipos disponibles para el canal seleccionado: ${tiposMensajeSoportados.join(', ')}`
+                          }
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -531,17 +564,14 @@ export const GeneralTab: React.FC = () => {
                       fullWidth 
                       disabled={plantillasFiltradas.length === 0}
                       sx={{ maxWidth: '100%' }}
+                      error={showErrors && !!errors.general?.plantillaComunicacion}
                     >
-                      <InputLabel>Plantilla de comunicación</InputLabel>
-                      <Select 
-                        {...field} 
-                        label="Plantilla de comunicación"
-                        value={plantillasFiltradas.some(p => p.id === field.value) ? field.value : ''}
-                      >
+                      <InputLabel>Plantilla de Comunicación</InputLabel>
+                      <Select {...field} label="Plantilla de Comunicación">
                         {plantillasFiltradas.map((plantilla) => (
                           <MenuItem key={plantilla.id} value={plantilla.id}>
                             <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, maxWidth: '100%' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                                 <Typography 
                                   variant="body2" 
                                   fontWeight={600}
@@ -571,12 +601,17 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1 }}>
-                        {plantillasFiltradas.length === 0
-                          ? 'Primero selecciona un tipo de mensaje'
-                          : `${plantillasFiltradas.length} plantillas disponibles para ${watchedValues.tipoMensaje}`
-                        }
-                      </Typography>
+                      {showErrors && errors.general?.plantillaComunicacion && (
+                        <FormHelperText>{errors.general.plantillaComunicacion}</FormHelperText>
+                      )}
+                      {(!showErrors || !errors.general?.plantillaComunicacion) && (
+                        <FormHelperText>
+                          {plantillasFiltradas.length === 0
+                            ? 'Primero selecciona un tipo de mensaje'
+                            : `${plantillasFiltradas.length} plantillas disponibles para ${watchedValues.tipoMensaje}`
+                          }
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   )}
                 />
@@ -588,31 +623,21 @@ export const GeneralTab: React.FC = () => {
         <Card 
          sx={{
             width: '45%',
-            minWidth: 350,
-            borderRadius: '20px',
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.3)',
-            height: 'fit-content',
+            minWidth: 400,
             maxHeight: 'calc(100vh - 200px)',
             overflowY: 'auto',
-            overflowX: 'auto'
+            background: 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255,255,255,0.3)',
           }}
         >
-          <CardContent
-            sx={{
-              p: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              maxWidth: '100%',
-            }}
-          >
+          <CardContent sx={{ p: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Box sx={{
-                width: 36,
-                height: 36,
-                borderRadius: '10px',
+                width: 40,
+                height: 40,
+                borderRadius: '12px',
                 background: 'linear-gradient(135deg, #10b981, #34d399)',
                 display: 'flex',
                 alignItems: 'center',

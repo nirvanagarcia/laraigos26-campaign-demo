@@ -10,7 +10,7 @@ export interface CampaignData {
     horaProgramacion?: string;
     grupo: string;
     canal: string;
-    tipoMensaje: string; // ✅ Cambiado a string genérico para permitir valores vacíos
+    tipoMensaje: string;
     plantillaComunicacion: string;
     name?: string;
     category?: string;
@@ -30,6 +30,8 @@ export interface CampaignData {
     };
     segmentation: string[];
     estimatedReach: number;
+    // Nueva validación para archivo Excel
+    hasExcelFile?: boolean;
   };
   
   mensaje: {
@@ -39,6 +41,27 @@ export interface CampaignData {
     channels: string[];
     callToAction: string;
     personalizedFields: string[];
+  };
+}
+
+// Nueva interfaz para errores de validación
+export interface CampaignValidationErrors {
+  general?: {
+    titulo?: string;
+    descripcion?: string;
+    fechaInicio?: string;
+    fechaFin?: string;
+    fuente?: string;
+    tipoEjecucion?: string;
+    fechaProgramacion?: string;
+    horaProgramacion?: string;
+    grupo?: string;
+    canal?: string;
+    tipoMensaje?: string;
+    plantillaComunicacion?: string;
+  };
+  personas?: {
+    hasExcelFile?: string;
   };
 }
 
@@ -53,4 +76,11 @@ export interface CampaignFormContextType {
   updateFormData: (section: keyof CampaignData, data: any) => void;
   resetForm: () => void;
   isValid: boolean;
+  errors: CampaignValidationErrors;
+  validateForm: () => boolean;
+  // Nuevas propiedades para controlar cuándo mostrar errores
+  showErrors: boolean;
+  validatedTabs: Set<string>;
+  validateTab: (tabName: string) => boolean;
+  attemptedSave: boolean;
 }

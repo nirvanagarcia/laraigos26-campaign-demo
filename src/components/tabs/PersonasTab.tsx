@@ -20,7 +20,7 @@ import { ExcelDataTable } from '../tables/ExcelDataTable';
 import { personasMockData, oportunidadesMockData } from '../../data/mockData';
 
 export const PersonasTab: React.FC = () => {
-  const { formData } = useCampaignForm();
+  const { formData, updateFormData, errors, showErrors } = useCampaignForm();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { 
     excelData, 
@@ -39,11 +39,20 @@ export const PersonasTab: React.FC = () => {
     const file = event.target.files?.[0];
     if (file) {
       processExcelFile(file);
+      // Actualizar el estado para indicar que se ha cargado un archivo
+      updateFormData('personas', { hasExcelFile: true });
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
+
+  // Actualizar cuando se limpia la data
+  React.useEffect(() => {
+    if (!excelData) {
+      updateFormData('personas', { hasExcelFile: false });
+    }
+  }, [excelData, updateFormData]);
 
   const fuente = formData.general.fuente;
 
@@ -106,7 +115,7 @@ export const PersonasTab: React.FC = () => {
             width: 48,
             height: 48,
             borderRadius: '16px',
-            background: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            background: 'linear-gradient(135deg, #667eea, #764ba2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -117,15 +126,15 @@ export const PersonasTab: React.FC = () => {
           <Box>
             <Typography variant="h5" sx={{ 
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #4facfe, #00f2fe)',
+              background: 'linear-gradient(45deg, #667eea, #764ba2)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              Personas Preexistentes
+              Base de Personas
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {personasMockData.length} personas disponibles en la base de datos
+              {personasMockData.length} personas registradas en el sistema
             </Typography>
           </Box>
         </Box>
@@ -133,7 +142,7 @@ export const PersonasTab: React.FC = () => {
         <ExcelDataTable
           headers={tableData.headers}
           rows={tableData.rows}
-          defaultColumnConfig={{ width: 150 }}
+          defaultColumnConfig={{ width: 140 }}
         />
       </Paper>
     );
@@ -207,19 +216,18 @@ export const PersonasTab: React.FC = () => {
             width: 48,
             height: 48,
             borderRadius: '16px',
-            background: 'linear-gradient(135deg, #f093fb, #f5576c)',
+            background: 'linear-gradient(135deg, #10b981, #34d399)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             mr: 2,
-            fontSize: '1.5rem'
           }}>
-            🎭
+            <DescriptionIcon sx={{ color: 'white', fontSize: 24 }} />
           </Box>
           <Box>
             <Typography variant="h5" sx={{ 
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+              background: 'linear-gradient(45deg, #10b981, #34d399)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -264,7 +272,7 @@ export const PersonasTab: React.FC = () => {
               </Box>
 
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                📂 Importa tu archivo Excel
+                Importa tu archivo Excel
               </Typography>
               
               <Typography variant="body2" color="text.secondary" sx={{ mb: 4, maxWidth: 500 }}>
@@ -308,6 +316,13 @@ export const PersonasTab: React.FC = () => {
           </Fade>
         )}
 
+        {/* Mostrar error de validación si existe */}
+        {showErrors && errors.personas?.hasExcelFile && (
+          <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }}>
+            {errors.personas.hasExcelFile}
+          </Alert>
+        )}
+
         {error && (
           <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }}>
             {error}
@@ -321,7 +336,10 @@ export const PersonasTab: React.FC = () => {
                 headers={excelData.headers}
                 rows={excelData.rows}
                 onRemoveRows={removeRows}
-                onClearAll={clearData}
+                onClearAll={() => {
+                  clearData();
+                  updateFormData('personas', { hasExcelFile: false });
+                }}
               />
             </Box>
           </Fade>
@@ -346,19 +364,18 @@ export const PersonasTab: React.FC = () => {
           width: 48,
           height: 48,
           borderRadius: '16px',
-          background: 'linear-gradient(135deg, #f093fb, #f5576c)',
+          background: 'linear-gradient(135deg, #667eea, #764ba2)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           mr: 2,
-          fontSize: '1.5rem'
         }}>
-          🎭
+          👥
         </Box>
         <Box>
           <Typography variant="h5" sx={{ 
             fontWeight: 700,
-            background: 'linear-gradient(45deg, #f093fb, #f5576c)',
+            background: 'linear-gradient(45deg, #667eea, #764ba2)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
