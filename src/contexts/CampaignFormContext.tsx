@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { CampaignData, CampaignFormContextType } from '../types/campaign';
 
@@ -14,9 +14,8 @@ const initialCampaignData: CampaignData = {
     horaProgramacion: '',
     grupo: '',
     canal: '',
-    tipoMensaje: 'HSM',
+    tipoMensaje: '',
     plantillaComunicacion: '',
-    // Nuevos campos
     name: '',
     category: '',
     startDate: null,
@@ -62,7 +61,7 @@ interface CampaignFormProviderProps {
 export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ children }) => {
   const [formData, setFormData] = useState<CampaignData>(initialCampaignData);
 
-  const updateFormData = (section: keyof CampaignData, data: any) => {
+  const updateFormData = useCallback((section: keyof CampaignData, data: any) => {
     setFormData(prev => ({
       ...prev,
       [section]: {
@@ -70,13 +69,12 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
         ...data,
       },
     }));
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData(initialCampaignData);
-  };
+  }, []);
 
-  // Simple validation logic
   const isValid = Boolean(
     formData.general.titulo &&
     formData.general.descripcion &&

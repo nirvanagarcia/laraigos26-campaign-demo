@@ -1,19 +1,17 @@
 export interface CampaignData {
-  // General tab data
   general: {
     titulo: string;
     descripcion: string;
     fechaInicio: Date | null;
     fechaFin: Date | null;
-    fuente: 'INTERNA' | 'EXTERNA' | 'OPORTUNIDADES';
+    fuente: 'PERSONAS' | 'EXTERNA' | 'OPORTUNIDADES';
     tipoEjecucion: 'MANUAL' | 'PROGRAMADA';
     fechaProgramacion?: Date | null;
     horaProgramacion?: string;
     grupo: string;
     canal: string;
-    tipoMensaje: 'HSM' | 'CORREO' | 'SMS';
+    tipoMensaje: string; // ✅ Cambiado a string genérico para permitir valores vacíos
     plantillaComunicacion: string;
-    // Nuevos campos para compatibilidad
     name?: string;
     category?: string;
     startDate?: Date | null;
@@ -23,7 +21,6 @@ export interface CampaignData {
     tags?: string[];
   };
   
-  // Personas tab data
   personas: {
     targetAudience: string;
     demographics: {
@@ -35,11 +32,10 @@ export interface CampaignData {
     estimatedReach: number;
   };
   
-  // Mensaje tab data
   mensaje: {
     title: string;
     content: string;
-    tone: 'formal' | 'casual' | 'friendly' | 'professional';
+    tone: string;
     channels: string[];
     callToAction: string;
     personalizedFields: string[];

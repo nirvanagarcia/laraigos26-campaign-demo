@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { CampaignFormProvider, useCampaignForm } from '../contexts/CampaignFormContext';
 import { TabPanel, a11yProps } from './TabPanel';
-import { GeneralTab } from './tabs/GeneralTabNew';
+import { GeneralTab } from './tabs/GeneralTab';
 import { PersonasTab } from './tabs/PersonasTab';
 import { MensajeTab } from './tabs/MensajeTab';
 
@@ -35,7 +35,6 @@ const CampaignTabsContent: React.FC = () => {
   const handleSave = () => {
     console.log('Guardando campaña:', formData);
     setShowAlert(true);
-    // Aquí integrarías con tu API usando RTK Query
   };
 
   const handleReset = () => {
@@ -201,7 +200,6 @@ const CampaignTabsContent: React.FC = () => {
           <MensajeTab />
         </TabPanel>
 
-        {/* Debug Panel - Solo para desarrollo */}
         <Paper 
           elevation={0} 
           sx={{ 

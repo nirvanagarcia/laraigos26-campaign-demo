@@ -45,7 +45,7 @@ export const GeneralTab: React.FC = () => {
 
   const fuenteOptions = [
     { value: 'EXTERNA', label: 'EXTERNA', icon: '🌐' },
-    { value: 'INTERNA', label: 'INTERNA', icon: '🏢' },
+    { value: 'PERSONAS', label: 'PERSONAS', icon: '🏢' },
     { value: 'OPORTUNIDADES', label: 'OPORTUNIDADES', icon: '🎯' },
   ];
 

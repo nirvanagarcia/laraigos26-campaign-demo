@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Box,
@@ -27,49 +27,47 @@ export const MensajeTab: React.FC = () => {
 
   const watchedValues = watch();
 
-  React.useEffect(() => {
-    updateFormData('mensaje', watchedValues);
-  }, [watchedValues, updateFormData]);
+  const handleFormUpdate = useCallback((data: any) => {
+    updateFormData('mensaje', data);
+  }, [updateFormData]);
 
-  const toneOptions = [
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleFormUpdate(watchedValues);
+    }, 200);
+    return () => clearTimeout(timeoutId);
+  }, [watchedValues, handleFormUpdate]);
+
+  const toneOptions = useMemo(() => [
     { value: 'formal', label: 'Formal' },
     { value: 'casual', label: 'Casual' },
     { value: 'friendly', label: 'Amigable' },
     { value: 'professional', label: 'Profesional' },
-  ];
+  ], []);
 
-  const channelOptions = [
-    'Email',
-    'SMS',
-    'WhatsApp',
-    'Facebook',
-    'Instagram',
-    'LinkedIn',
-    'Twitter',
-    'YouTube',
-    'TikTok',
-    'Google Ads',
-    'Display Ads',
-    'Push Notifications',
-  ];
+  const channelOptions = useMemo(() => [
+    'Email', 'SMS', 'WhatsApp', 'Facebook', 'Instagram', 
+    'LinkedIn', 'Twitter', 'YouTube', 'TikTok', 'Google Ads',
+    'Display Ads', 'Push Notifications',
+  ], []);
 
-  const addPersonalizedField = () => {
+  const addPersonalizedField = useCallback(() => {
     const currentFields = getValues('personalizedFields') || [];
     setValue('personalizedFields', [...currentFields, '']);
-  };
+  }, [getValues, setValue]);
 
-  const removePersonalizedField = (index: number) => {
+  const removePersonalizedField = useCallback((index: number) => {
     const currentFields = getValues('personalizedFields') || [];
     const newFields = currentFields.filter((_, i) => i !== index);
     setValue('personalizedFields', newFields);
-  };
+  }, [getValues, setValue]);
 
-  const updatePersonalizedField = (index: number, value: string) => {
+  const updatePersonalizedField = useCallback((index: number, value: string) => {
     const currentFields = getValues('personalizedFields') || [];
     const newFields = [...currentFields];
     newFields[index] = value;
     setValue('personalizedFields', newFields);
-  };
+  }, [getValues, setValue]);
 
   return (
     <Paper 
@@ -286,7 +284,7 @@ export const MensajeTab: React.FC = () => {
                 
                 {(!field.value || field.value.length === 0) && (
                   <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                    No hay campos personalizados. Haz clic en "Agregar Campo" para añadir uno.
+                    No hay campos personalizados definidos. Usa el botón "Agregar Campo" para añadir variables.
                   </Typography>
                 )}
               </Box>
@@ -294,19 +292,21 @@ export const MensajeTab: React.FC = () => {
           />
         </Box>
 
-        <Box sx={{ 
-          mt: 4, 
-          p: 3, 
-          borderRadius: '16px',
-          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05))',
-          border: '1px solid rgba(102, 126, 234, 0.1)'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 3, 
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(52, 211, 153, 0.05))',
+            border: '1px solid rgba(16, 185, 129, 0.1)'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <Box sx={{
               width: 32,
               height: 32,
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+              background: 'linear-gradient(135deg, #10b981, #34d399)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -397,7 +397,7 @@ export const MensajeTab: React.FC = () => {
               )}
             </Box>
           </Box>
-        </Box>
+        </Paper>
       </Box>
     </Paper>
   );
