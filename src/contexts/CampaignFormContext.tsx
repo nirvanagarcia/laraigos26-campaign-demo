@@ -34,6 +34,7 @@ const initialCampaignData: CampaignData = {
     segmentation: [],
     estimatedReach: 0,
     hasExcelFile: false,
+    excelData: null,
   },
   mensaje: {
     title: '',
@@ -80,7 +81,6 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     setAttemptedSave(false);
   }, []);
 
-  // Función para validar un tab específico
   const validateTab = useCallback((tabName: string): boolean => {
     setValidatedTabs(prev => new Set(prev).add(tabName));
     
@@ -88,7 +88,6 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     return Object.keys(tabErrors).length === 0;
   }, [formData]);
 
-  // Función auxiliar para obtener errores de un tab específico
   const getTabValidationErrors = useCallback((tabName: string) => {
     const tabErrors: any = {};
 
@@ -142,14 +141,12 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     return tabErrors;
   }, [formData]);
 
-  // Validación completa del formulario
   const errors = useMemo((): CampaignValidationErrors => {
     const validationErrors: CampaignValidationErrors = {
       general: {},
       personas: {},
     };
 
-    // Solo mostrar errores si se ha intentado guardar o si el tab ha sido validado
     if (attemptedSave || validatedTabs.has('general')) {
       validationErrors.general = getTabValidationErrors('general');
     }
@@ -162,10 +159,7 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
   }, [formData, validatedTabs, attemptedSave, getTabValidationErrors]);
 
   const validateForm = useCallback((): boolean => {
-    // Marcar que se intentó guardar
     setAttemptedSave(true);
-    
-    // Validar todos los tabs
     setValidatedTabs(new Set(['general', 'personas', 'mensaje']));
     
     const generalErrors = getTabValidationErrors('general');
@@ -177,25 +171,8 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     return !hasGeneralErrors && !hasPersonasErrors;
   }, [getTabValidationErrors]);
 
-  const isValid = useMemo(() => {
-    // Solo considerar válido si no hay errores en los tabs validados
-    const generalErrors = validatedTabs.has('general') || attemptedSave 
-      ? getTabValidationErrors('general') 
-      : {};
-    const personasErrors = validatedTabs.has('personas') || attemptedSave 
-      ? getTabValidationErrors('personas') 
-      : {};
-    
-    const hasGeneralErrors = Object.keys(generalErrors).length > 0;
-    const hasPersonasErrors = Object.keys(personasErrors).length > 0;
-    
-    return !hasGeneralErrors && !hasPersonasErrors;
-  }, [formData, validatedTabs, attemptedSave, getTabValidationErrors]);
-
-  // Determinar si mostrar errores
   const showErrors = attemptedSave || validatedTabs.size > 0;
 
-  // Para el botón de guardar, verificar si el formulario está completo (independiente de showErrors)
   const isFormComplete = useMemo(() => {
     const allGeneralErrors = getTabValidationErrors('general');
     const allPersonasErrors = getTabValidationErrors('personas');
@@ -209,7 +186,7 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
         formData,
         updateFormData,
         resetForm,
-        isValid: isFormComplete, // Cambiar para usar isFormComplete en lugar de isValid
+        isValid: isFormComplete,
         errors,
         validateForm,
         showErrors,

@@ -38,12 +38,9 @@ const CampaignTabsContent: React.FC = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     const currentTabName = getTabName(activeTab);
     
-    // Solo validar si no es el primer tab o si ya hemos empezado a validar
     if (activeTab > 0 || formData.general.titulo || formData.general.descripcion || Object.values(formData.general).some(value => value && value !== '')) {
-      // Intentar validar el tab actual antes de cambiar
       const isCurrentTabValid = validateTab(currentTabName);
       
-      // Si el tab actual no es válido, mostrar un mensaje pero permitir el cambio
       if (!isCurrentTabValid) {
         console.log(`Tab ${currentTabName} tiene errores, pero permitiendo el cambio`);
       }
@@ -58,7 +55,6 @@ const CampaignTabsContent: React.FC = () => {
       setShowAlert(true);
     } else {
       console.log('Formulario inválido:', errors);
-      // Opcional: mostrar un alert de error
     }
   };
 
@@ -67,7 +63,6 @@ const CampaignTabsContent: React.FC = () => {
     setActiveTab(0);
   };
 
-  // Contar errores por tab
   const getTabErrors = () => {
     const generalErrors = Object.keys(errors.general || {}).length;
     const personasErrors = Object.keys(errors.personas || {}).length;
@@ -75,7 +70,7 @@ const CampaignTabsContent: React.FC = () => {
     return {
       general: generalErrors,
       personas: personasErrors,
-      mensaje: 0, // Por ahora no hay validaciones en mensaje
+      mensaje: 0,
     };
   };
 
@@ -171,7 +166,7 @@ const CampaignTabsContent: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="false">
+      <Container maxWidth={false}>
         <Paper 
           elevation={0} 
           sx={{ 

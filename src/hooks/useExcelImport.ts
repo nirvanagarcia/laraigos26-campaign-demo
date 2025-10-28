@@ -12,14 +12,13 @@ export interface ExcelData {
 }
 
 export const useExcelImport = () => {
-  const [excelData, setExcelData] = useState<ExcelData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const processExcelFile = useCallback(async (file: File): Promise<void> => {
+  const processExcelFile = useCallback(async (file: File): Promise<ExcelData | null> => {
     if (!file.name.match(/\.(xlsx|xls)$/)) {
       setError('Solo se permiten archivos Excel (.xlsx, .xls)');
-      return;
+      return null;
     }
 
     setIsLoading(true);
@@ -34,7 +33,7 @@ export const useExcelImport = () => {
 
       if (jsonData.length < 2) {
         setError('El archivo debe tener al menos 2 filas (header y datos)');
-        return;
+        return null;
       }
 
       let startIndex = 0;
@@ -49,7 +48,7 @@ export const useExcelImport = () => {
 
       if (jsonData.length <= startIndex + 1) {
         setError('No hay suficientes datos después del header');
-        return;
+        return null;
       }
 
       const headers = jsonData[startIndex].filter(Boolean).map(String);
@@ -68,50 +67,29 @@ export const useExcelImport = () => {
           };
         });
 
-      setExcelData({
+      const excelData = {
         headers,
         rows: processedRows
-      });
+      };
+
+      return excelData;
     } catch (err) {
       setError('Error al procesar el archivo Excel');
       console.error(err);
+      return null;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const removeRow = useCallback((rowId: string) => {
-    setExcelData(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        rows: prev.rows.filter(row => row.id !== rowId)
-      };
-    });
-  }, []);
-
-  const removeRows = useCallback((rowIds: string[]) => {
-    setExcelData(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        rows: prev.rows.filter(row => !rowIds.includes(row.id))
-      };
-    });
-  }, []);
-
-  const clearData = useCallback(() => {
-    setExcelData(null);
+  const clearError = useCallback(() => {
     setError(null);
   }, []);
 
   return {
-    excelData,
     isLoading,
     error,
     processExcelFile,
-    removeRow,
-    removeRows,
-    clearData
+    clearError
   };
 };

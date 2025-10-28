@@ -23,34 +23,58 @@ export const PersonasTab: React.FC = () => {
   const { formData, updateFormData, errors, showErrors } = useCampaignForm();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { 
-    excelData, 
     isLoading, 
     error, 
     processExcelFile, 
-    removeRows, 
-    clearData 
   } = useExcelImport();
+
+  // Usar los datos del contexto en lugar del hook local
+  const excelData = formData.personas.excelData;
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      processExcelFile(file);
-      // Actualizar el estado para indicar que se ha cargado un archivo
-      updateFormData('personas', { hasExcelFile: true });
+      const data = await processExcelFile(file);
+      if (data) {
+        updateFormData('personas', { 
+          hasExcelFile: true,
+          excelData: data
+        });
+      }
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  // Actualizar cuando se limpia la data
+  const removeRows = (rowIds: string[]) => {
+    if (!excelData) return;
+    
+    const updatedRows = excelData.rows.filter(row => !rowIds.includes(row.id));
+    updateFormData('personas', {
+      excelData: {
+        ...excelData,
+        rows: updatedRows
+      }
+    });
+  };
+
+  const clearData = () => {
+    updateFormData('personas', { 
+      hasExcelFile: false,
+      excelData: null
+    });
+  };
+
   React.useEffect(() => {
     if (!excelData) {
       updateFormData('personas', { hasExcelFile: false });
+    } else {
+      updateFormData('personas', { hasExcelFile: true });
     }
   }, [excelData, updateFormData]);
 
@@ -166,7 +190,7 @@ export const PersonasTab: React.FC = () => {
             width: 48,
             height: 48,
             borderRadius: '16px',
-            background: 'linear-gradient(135deg, #fa709a, #fee140)',
+            background: 'linear-gradient(135deg, #f59e0b, #f97316)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -177,7 +201,7 @@ export const PersonasTab: React.FC = () => {
           <Box>
             <Typography variant="h5" sx={{ 
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #fa709a, #fee140)',
+              background: 'linear-gradient(45deg, #f59e0b, #f97316)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -338,7 +362,6 @@ export const PersonasTab: React.FC = () => {
                 onRemoveRows={removeRows}
                 onClearAll={() => {
                   clearData();
-                  updateFormData('personas', { hasExcelFile: false });
                 }}
               />
             </Box>
@@ -369,6 +392,7 @@ export const PersonasTab: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           mr: 2,
+          fontSize: '1.5rem'
         }}>
           👥
         </Box>

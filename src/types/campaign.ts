@@ -30,8 +30,14 @@ export interface CampaignData {
     };
     segmentation: string[];
     estimatedReach: number;
-    // Nueva validación para archivo Excel
-    hasExcelFile?: boolean;
+    hasExcelFile: boolean;
+    excelData?: {
+      headers: string[];
+      rows: Array<{
+        id: string;
+        data: Record<string, any>;
+      }>;
+    } | null;
   };
   
   mensaje: {
@@ -44,7 +50,6 @@ export interface CampaignData {
   };
 }
 
-// Nueva interfaz para errores de validación
 export interface CampaignValidationErrors {
   general?: {
     titulo?: string;
@@ -78,7 +83,6 @@ export interface CampaignFormContextType {
   isValid: boolean;
   errors: CampaignValidationErrors;
   validateForm: () => boolean;
-  // Nuevas propiedades para controlar cuándo mostrar errores
   showErrors: boolean;
   validatedTabs: Set<string>;
   validateTab: (tabName: string) => boolean;
