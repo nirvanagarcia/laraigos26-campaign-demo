@@ -36,7 +36,7 @@ export const WhatsAppPreview: React.FC<WhatsAppPreviewProps> = ({ plantilla }) =
       </Box>
       <Box>
         <Typography sx={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
-          Mi Empresa
+          LARAIGO BOT
         </Typography>
         <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>
           en línea

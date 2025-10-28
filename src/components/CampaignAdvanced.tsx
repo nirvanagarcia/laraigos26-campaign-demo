@@ -128,7 +128,7 @@ const CampaignTabsContent: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Paper 
           elevation={0} 
           sx={{ 

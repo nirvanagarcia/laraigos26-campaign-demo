@@ -11,9 +11,7 @@ import {
   Paper,
   Card,
   CardContent,
-  Divider,
   Chip,
-  Stack,
 } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -66,7 +64,6 @@ export const GeneralTab: React.FC = () => {
     return mockPlantillas.filter(p => p.tipo === watchedValues.tipoMensaje);
   }, [watchedValues.tipoMensaje]);
 
-
   React.useEffect(() => {
     const tiposDisponibles = tiposMensajeSoportados;
     
@@ -102,25 +99,36 @@ export const GeneralTab: React.FC = () => {
   ], []);
 
   const tipoMensajeOptions = useMemo(() => [
-    { value: 'HSM', label: 'WhatsApp HSM', icon: '📱', color: '#25d366' },
-    { value: 'SMS', label: 'SMS', icon: '💬', color: '#0084ff' },
-    { value: 'CORREO', label: 'Email', icon: '📧', color: '#ea4335' },
-    { value: 'HTML', label: 'Email HTML', icon: '📨', color: '#673ab7' },
+    { value: 'HSM', label: 'WhatsApp HSM', icon: '📱' },
+    { value: 'SMS', label: 'SMS', icon: '💬', },
+    { value: 'CORREO', label: 'Email', icon: '📧'},
+    { value: 'HTML', label: 'HTML', icon: '📨' },
   ], []);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ display: 'flex', gap: 3 }}>
-        {/* Formulario Principal */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          gap: 3,
+          alignItems: 'flex-start', 
+          minHeight: '100vh',
+          overflow: 'hidden',
+        }}
+      >
         <Paper 
           elevation={0} 
           sx={{ 
-            flex: 1,
+            width: '55%',
+            minWidth: 650,
+            maxWidth: 'none',
             p: 4,
             borderRadius: '20px',
             background: 'rgba(255,255,255,0.95)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.3)',
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -153,8 +161,16 @@ export const GeneralTab: React.FC = () => {
             </Box>
           </Box>
           
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Título */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 3,
+              width: '100%',
+              maxWidth: '100%',
+              overflow: 'hidden',
+            }}
+          >
             <Controller
               name="titulo"
               control={control}
@@ -168,11 +184,16 @@ export const GeneralTab: React.FC = () => {
                   variant="outlined"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
+                  sx={{
+                    maxWidth: '100%',
+                    '& .MuiOutlinedInput-root': {
+                      maxWidth: '100%',
+                    }
+                  }}
                 />
               )}
             />
 
-            {/* Descripción */}
             <Controller
               name="descripcion"
               control={control}
@@ -188,13 +209,18 @@ export const GeneralTab: React.FC = () => {
                   variant="outlined"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
+                  sx={{
+                    maxWidth: '100%',
+                    '& .MuiOutlinedInput-root': {
+                      maxWidth: '100%',
+                    }
+                  }}
                 />
               )}
             />
 
-            {/* Fechas */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Box sx={{ flex: '1 1 300px' }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', maxWidth: '100%' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="fechaInicio"
                   control={control}
@@ -207,7 +233,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          helperText: "Selecciona la fecha inicio de vigencia de tu campaña"
+                          helperText: "Selecciona la fecha inicio de vigencia de tu campaña",
+                          sx: { maxWidth: '100%' }
                         }
                       }}
                     />
@@ -215,7 +242,7 @@ export const GeneralTab: React.FC = () => {
                 />
               </Box>
 
-              <Box sx={{ flex: '1 1 300px' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="fechaFin"
                   control={control}
@@ -228,7 +255,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          helperText: "Selecciona la fecha fin de vigencia de tu campaña"
+                          helperText: "Selecciona la fecha fin de vigencia de tu campaña",
+                          sx: { maxWidth: '100%' }
                         }
                       }}
                     />
@@ -237,14 +265,13 @@ export const GeneralTab: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Fuente y Tipo de Ejecución */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Box sx={{ flex: '1 1 300px' }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', maxWidth: '100%' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="fuente"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
                       <InputLabel>Fuente</InputLabel>
                       <Select {...field} label="Fuente">
                         {fuenteOptions.map((option) => (
@@ -264,12 +291,12 @@ export const GeneralTab: React.FC = () => {
                 />
               </Box>
 
-              <Box sx={{ flex: '1 1 300px' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="tipoEjecucion"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
                       <InputLabel>Tipo de ejecución</InputLabel>
                       <Select {...field} label="Tipo de ejecución">
                         {tipoEjecucionOptions.map((option) => (
@@ -290,19 +317,19 @@ export const GeneralTab: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Campos condicionales para programación */}
             {watchedValues.tipoEjecucion === 'PROGRAMADA' && (
               <Box sx={{ 
                 p: 3, 
                 borderRadius: '16px', 
                 background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))',
-                border: '1px solid rgba(102, 126, 234, 0.1)'
+                border: '1px solid rgba(102, 126, 234, 0.1)',
+                maxWidth: '100%'
               }}>
                 <Typography variant="h6" sx={{ mb: 2, color: '#667eea', fontWeight: 600 }}>
                   ⏰ Configuración de Programación
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                  <Box sx={{ flex: '1 1 300px' }}>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', maxWidth: '100%' }}>
+                  <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                     <Controller
                       name="fechaProgramacion"
                       control={control}
@@ -314,7 +341,8 @@ export const GeneralTab: React.FC = () => {
                           slotProps={{
                             textField: {
                               fullWidth: true,
-                              variant: "outlined"
+                              variant: "outlined",
+                              sx: { maxWidth: '100%' }
                             }
                           }}
                         />
@@ -322,7 +350,7 @@ export const GeneralTab: React.FC = () => {
                     />
                   </Box>
 
-                  <Box sx={{ flex: '1 1 300px' }}>
+                  <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                     <Controller
                       name="horaProgramacion"
                       control={control}
@@ -345,7 +373,8 @@ export const GeneralTab: React.FC = () => {
                           slotProps={{
                             textField: {
                               fullWidth: true,
-                              variant: "outlined"
+                              variant: "outlined",
+                              sx: { maxWidth: '100%' }
                             }
                           }}
                         />
@@ -356,23 +385,40 @@ export const GeneralTab: React.FC = () => {
               </Box>
             )}
 
-            {/* Grupo y Canal */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Box sx={{ flex: '1 1 300px' }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', maxWidth: '100%' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="grupo"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
                       <InputLabel>Grupo</InputLabel>
                       <Select {...field} label="Grupo">
                         {mockGrupos.map((grupo) => (
                           <MenuItem key={grupo.id} value={grupo.id}>
-                            <Box>
-                              <Typography variant="body2" fontWeight={600}>
+                            <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
+                              <Typography 
+                                variant="body2" 
+                                fontWeight={600}
+                                sx={{ 
+                                  whiteSpace: 'nowrap', 
+                                  overflow: 'hidden', 
+                                  textOverflow: 'ellipsis',
+                                  maxWidth: '250px'
+                                }}
+                              >
                                 {grupo.nombre}
                               </Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography 
+                                variant="caption" 
+                                color="text.secondary"
+                                sx={{ 
+                                  whiteSpace: 'nowrap', 
+                                  overflow: 'hidden', 
+                                  textOverflow: 'ellipsis',
+                                  maxWidth: '250px'
+                                }}
+                              >
                                 {grupo.cantidad} contactos
                               </Typography>
                             </Box>
@@ -387,21 +433,39 @@ export const GeneralTab: React.FC = () => {
                 />
               </Box>
 
-              <Box sx={{ flex: '1 1 300px' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="canal"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth>
+                    <FormControl fullWidth sx={{ maxWidth: '100%' }}>
                       <InputLabel>Canal</InputLabel>
                       <Select {...field} label="Canal">
                         {mockCanales.filter(c => c.activo).map((canal) => (
                           <MenuItem key={canal.id} value={canal.id}>
-                            <Box>
-                              <Typography variant="body2" fontWeight={600}>
+                            <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
+                              <Typography 
+                                variant="body2" 
+                                fontWeight={600}
+                                sx={{ 
+                                  whiteSpace: 'nowrap', 
+                                  overflow: 'hidden', 
+                                  textOverflow: 'ellipsis',
+                                  maxWidth: '250px'
+                                }}
+                              >
                                 {canal.nombre}
                               </Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography 
+                                variant="caption" 
+                                color="text.secondary"
+                                sx={{ 
+                                  whiteSpace: 'nowrap', 
+                                  overflow: 'hidden', 
+                                  textOverflow: 'ellipsis',
+                                  maxWidth: '250px'
+                                }}
+                              >
                                 {canal.descripcion}
                               </Typography>
                             </Box>
@@ -417,14 +481,17 @@ export const GeneralTab: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Tipo de Mensaje y Plantilla */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Box sx={{ flex: '1 1 300px' }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', maxWidth: '100%' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="tipoMensaje"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth disabled={tiposMensajeSoportados.length === 0}>
+                    <FormControl 
+                      fullWidth 
+                      disabled={tiposMensajeSoportados.length === 0}
+                      sx={{ maxWidth: '100%' }}
+                    >
                       <InputLabel>Tipo de Mensaje</InputLabel>
                       <Select 
                         {...field} 
@@ -437,7 +504,7 @@ export const GeneralTab: React.FC = () => {
                           <MenuItem key={option.value} value={option.value}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <span>{option.icon}</span>
-                              <Typography sx={{ color: option.color, fontWeight: 600 }}>
+                              <Typography sx={{ fontWeight: 600 }}>
                                 {option.label}
                               </Typography>
                             </Box>
@@ -455,12 +522,16 @@ export const GeneralTab: React.FC = () => {
                 />
               </Box>
 
-              <Box sx={{ flex: '1 1 300px' }}>
+              <Box sx={{ flex: '1 1 300px', minWidth: 300, maxWidth: 'calc(50% - 8px)' }}>
                 <Controller
                   name="plantillaComunicacion"
                   control={control}
                   render={({ field }) => (
-                    <FormControl fullWidth disabled={plantillasFiltradas.length === 0}>
+                    <FormControl 
+                      fullWidth 
+                      disabled={plantillasFiltradas.length === 0}
+                      sx={{ maxWidth: '100%' }}
+                    >
                       <InputLabel>Plantilla de comunicación</InputLabel>
                       <Select 
                         {...field} 
@@ -469,19 +540,32 @@ export const GeneralTab: React.FC = () => {
                       >
                         {plantillasFiltradas.map((plantilla) => (
                           <MenuItem key={plantilla.id} value={plantilla.id}>
-                            <Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography variant="body2" fontWeight={600}>
+                            <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, maxWidth: '100%' }}>
+                                <Typography 
+                                  variant="body2" 
+                                  fontWeight={600}
+                                  sx={{ 
+                                    whiteSpace: 'nowrap', 
+                                    overflow: 'hidden', 
+                                    textOverflow: 'ellipsis',
+                                    maxWidth: '180px'
+                                  }}
+                                >
                                   {plantilla.nombre}
                                 </Typography>
                                 <Chip 
                                   label={plantilla.categoria} 
                                   size="small" 
-                                  sx={{ fontSize: '0.7rem' }}
+                                  sx={{ fontSize: '0.7rem', flexShrink: 0 }}
                                 />
                               </Box>
                               <Typography variant="caption" color="text.secondary">
-                                Variables: {plantilla.variables.join(', ')}
+                                Variables: {
+                                  plantilla.variables.length > 3
+                                    ? `${plantilla.variables.slice(0, 3).join(', ')}...`
+                                    : plantilla.variables.join(', ')
+                                }
                               </Typography>
                             </Box>
                           </MenuItem>
@@ -501,20 +585,29 @@ export const GeneralTab: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Panel de Preview */}
         <Card 
-          sx={{ 
-            width: 420,
+         sx={{
+            width: '45%',
+            minWidth: 350,
             borderRadius: '20px',
             background: 'rgba(255,255,255,0.95)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.3)',
             height: 'fit-content',
-            position: 'sticky',
-            top: 20,
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            overflowX: 'auto'
           }}
         >
-          <CardContent sx={{ p: 3 }}>
+          <CardContent
+            sx={{
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              maxWidth: '100%',
+            }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Box sx={{
                 width: 36,
@@ -532,61 +625,27 @@ export const GeneralTab: React.FC = () => {
                 Vista Previa
               </Typography>
             </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                flexGrow: 1,
+              }}
+            >
+              <Box sx={{
+                ...(selectedPlantilla?.tipo !== 'HTML' && {
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                })
+              }}>
+                <MessagePreview plantilla={selectedPlantilla} />
+              </Box>
+            </Box>
 
-            <MessagePreview plantilla={selectedPlantilla} />
-
-            {selectedPlantilla && (
-              <>
-                <Divider sx={{ my: 3 }} />
-                
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                    📝 Plantilla: {selectedPlantilla.nombre}
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                    <Chip 
-                      label={selectedPlantilla.tipo}
-                      size="small"
-                      sx={{
-                        background: 'linear-gradient(45deg, #667eea, #764ba2)',
-                        color: 'white',
-                        fontWeight: 600,
-                      }}
-                    />
-                    <Chip 
-                      label={selectedPlantilla.categoria}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </Stack>
-                </Box>
-
-                {selectedPlantilla.variables.length > 0 && (
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
-                      🔧 Variables disponibles:
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selectedPlantilla.variables.map((variable, index) => (
-                        <Chip
-                          key={index}
-                          label={`{{${variable}}}`}
-                          size="small"
-                          variant="outlined"
-                          sx={{ 
-                            fontSize: '0.7rem',
-                            fontFamily: 'monospace',
-                            background: 'rgba(102, 126, 234, 0.05)',
-                            borderColor: '#667eea',
-                            color: '#667eea'
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-              </>
-            )}
           </CardContent>
         </Card>
       </Box>

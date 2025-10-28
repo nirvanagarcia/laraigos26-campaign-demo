@@ -89,7 +89,7 @@ export const PersonasTab: React.FC = () => {
   }, []);
 
   if (fuente === 'PERSONAS') {
-    const tableData = getPersonasTableData();
+    const tableData = personasTableData;
     return (
       <Paper 
         elevation={0} 
@@ -131,17 +131,16 @@ export const PersonasTab: React.FC = () => {
         </Box>
 
         <ExcelDataTable
-          headers={personasTableData.headers}
-          rows={personasTableData.rows}
+          headers={tableData.headers}
+          rows={tableData.rows}
           defaultColumnConfig={{ width: 150 }}
-          enableRowSelection={false}
         />
       </Paper>
     );
   }
 
   if (fuente === 'OPORTUNIDADES') {
-    const tableData = getOportunidadesTableData();
+    const tableData = getOportunidadesTableData;
     return (
       <Paper 
         elevation={0} 
@@ -183,10 +182,9 @@ export const PersonasTab: React.FC = () => {
         </Box>
 
         <ExcelDataTable
-          headers={oportunidadesTableData.headers}
-          rows={oportunidadesTableData.rows}
+          headers={tableData.headers}
+          rows={tableData.rows}
           defaultColumnConfig={{ width: 140 }}
-          enableRowSelection={false}
         />
       </Paper>
     );
