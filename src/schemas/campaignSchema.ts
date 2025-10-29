@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { requiredString, requiredDate, requiredSelect, optionalString, trimmedString } from './common';
 
 export const excelRowSchema = z.object({
   id: z.string(),
@@ -10,53 +11,66 @@ export const excelDataSchema = z.object({
   rows: z.array(excelRowSchema)
 });
 
-export const campaignSchema = z.object({
-  general: z.object({
-    titulo: z.string().min(1, "El título es requerido"),
-    descripcion: z.string().min(1, "La descripción es requerida"),
-    fechaInicio: z.date().nullable().refine(val => val !== null, "La fecha de inicio es requerida"),
-    fechaFin: z.date().nullable().refine(val => val !== null, "La fecha de fin es requerida"),
-    fuente: z.enum(['EXTERNA', 'PERSONAS', 'OPORTUNIDADES']),
-    tipoEjecucion: z.enum(['MANUAL', 'PROGRAMADA']),
-    fechaProgramacion: z.date().nullable().optional(),
-    horaProgramacion: z.string().optional(),
-    grupo: z.string().min(1, "El grupo es requerido"),
-    canal: z.string().min(1, "El canal es requerido"),
-    tipoMensaje: z.string().min(1, "El tipo de mensaje es requerido"),
-    plantillaComunicacion: z.string().min(1, "La plantilla de comunicación es requerida")
-  }).refine((data) => {
-    if (data.tipoEjecucion === 'PROGRAMADA') {
-      return data.fechaProgramacion !== null && data.horaProgramacion?.trim() !== '';
+export const generalSchema = z.object({
+  titulo: trimmedString('titulo'),
+  descripcion: trimmedString('descripcion'),
+  fechaInicio: requiredDate('fechaInicio'),
+  fechaFin: requiredDate('fechaFin'),
+  fuente: z.enum(['EXTERNA', 'PERSONAS', 'OPORTUNIDADES']),
+  tipoEjecucion: z.enum(['MANUAL', 'PROGRAMADA']),
+  fechaProgramacion: z.date().nullable().optional(),
+  horaProgramacion: optionalString(),
+  grupo: requiredSelect('grupo'),
+  canal: requiredSelect('canal'),
+  tipoMensaje: requiredSelect('tipoMensaje'),
+  plantillaComunicacion: requiredSelect('plantillaComunicacion')
+}).superRefine((data, ctx) => {
+  if (data.tipoEjecucion === 'PROGRAMADA') {
+    if (!data.fechaProgramacion) {
+      ctx.addIssue({ path: ['fechaProgramacion'], code: z.ZodIssueCode.custom, message: 'Fecha de programación es requerida' });
     }
-    return true;
-  }, {
-    message: "Para ejecución programada se requiere fecha y hora de programación",
-    path: ['fechaProgramacion']
-  }),
-
-  personas: z.object({
-    targetAudience: z.string().optional(),
-    demographics: z.object({
-      ageRange: z.tuple([z.number(), z.number()]).default([18, 65]),
-      gender: z.string().optional(),
-      location: z.array(z.string()).default([])
-    }).optional(),
-    segmentation: z.array(z.string()).default([]),
-    estimatedReach: z.number().default(0),
-    hasExcelFile: z.boolean().default(false),
-    excelData: excelDataSchema.nullable().optional()
-  })
-}).refine((data) => {
-  if (data.general.fuente === 'EXTERNA' && !data.personas.hasExcelFile) {
-    return false;
+    if (!data.horaProgramacion?.trim()) {
+      ctx.addIssue({ path: ['horaProgramacion'], code: z.ZodIssueCode.custom, message: 'Hora de programación es requerida' });
+    }
   }
-  return true;
-}, {
-  message: "Debe cargar un archivo Excel cuando la fuente es Externa",
-  path: ['personas', 'hasExcelFile']
 });
 
+export const personasSchema = z.object({
+  targetAudience: optionalString(),
+  demographics: z.object({
+    ageRange: z.tuple([z.number(), z.number()]).default([18, 65]),
+    gender: optionalString(),
+    location: z.array(z.string()).default([])
+  }).optional(),
+  segmentation: z.array(z.string()).default([]),
+  estimatedReach: z.number().default(0),
+  hasExcelFile: z.boolean().default(false),
+  excelData: excelDataSchema.nullable().optional()
+});
+
+export const campaignSchema = z.object({
+  general: generalSchema,
+  personas: personasSchema
+}).superRefine((data, ctx) => {
+  if (data.general.fuente === 'EXTERNA' && !data.personas.hasExcelFile) {
+    ctx.addIssue({ path: ['personas', 'hasExcelFile'], code: z.ZodIssueCode.custom, message: "Debe cargar un archivo Excel cuando la fuente es Externa" });
+  }
+});
+
+export const createCampaignSchema = (config: { requireExcel?: boolean; allowedSources?: string[] } = {}) => {
+  return campaignSchema.superRefine((data, ctx) => {
+    if (config.requireExcel && !data.personas.hasExcelFile) {
+      ctx.addIssue({ path: ['personas', 'hasExcelFile'], code: z.ZodIssueCode.custom, message: 'Archivo Excel requerido por configuración' });
+    }
+    if (config.allowedSources && !config.allowedSources.includes(data.general.fuente)) {
+      ctx.addIssue({ path: ['general', 'fuente'], code: z.ZodIssueCode.custom, message: 'Fuente no permitida' });
+    }
+  });
+};
+
 export type CampaignFormData = z.infer<typeof campaignSchema>;
+export type GeneralFormData = z.infer<typeof generalSchema>;
+export type PersonasFormData = z.infer<typeof personasSchema>;
 export type ExcelData = z.infer<typeof excelDataSchema>;
 export type ExcelRow = z.infer<typeof excelRowSchema>;
 

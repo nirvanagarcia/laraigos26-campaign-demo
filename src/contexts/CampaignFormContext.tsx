@@ -1,55 +1,26 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import type { ReactNode } from 'react';
 import { campaignSchema, type CampaignFormData } from '../schemas/campaignSchema';
+import { createSafeDefaults, getResolver } from '../utils/formHelpers';
 
-const initialCampaignData: CampaignFormData = {
-  general: {
-    titulo: '',
-    descripcion: '',
-    fechaInicio: null,
-    fechaFin: null,
-    fuente: 'EXTERNA',
-    tipoEjecucion: 'MANUAL',
-    fechaProgramacion: null,
-    horaProgramacion: '',
-    grupo: '',
-    canal: '',
-    tipoMensaje: '',
-    plantillaComunicacion: '',
-  },
-  personas: {
-    targetAudience: '',
-    demographics: {
-      ageRange: [18, 65],
-      gender: '',
-      location: [],
-    },
-    segmentation: [],
-    estimatedReach: 0,
-    hasExcelFile: false,
-    excelData: null,
-  }
-};
+const initialCampaignData: CampaignFormData = createSafeDefaults();
 
 interface CampaignFormContextType {
   methods: UseFormReturn<CampaignFormData>;
-  
   formData: CampaignFormData;
   isValid: boolean;
   errors: any;
-  
   validateForm: () => Promise<boolean>;
   resetForm: () => void;
-  
   validatedTabs: Set<string>;
   validateTab: (tabName: string) => Promise<boolean>;
   showErrors: boolean;
   attemptedSave: boolean;
-  
   updateFormData: (section: keyof CampaignFormData, data: any) => void;
+  getTabErrors: () => { general: number; personas: number };
+  isTabValid: (tabName: string) => boolean;
 }
 
 const CampaignFormContext = createContext<CampaignFormContextType | undefined>(undefined);
@@ -64,14 +35,15 @@ export const useCampaignForm = () => {
 
 interface CampaignFormProviderProps {
   children: ReactNode;
+  config?: { requireExcel?: boolean; allowedSources?: string[] };
 }
 
-export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ children }) => {
+export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ children, config = {} }) => {
   const [validatedTabs, setValidatedTabs] = useState<Set<string>>(new Set());
   const [attemptedSave, setAttemptedSave] = useState(false);
 
   const methods = useForm<CampaignFormData>({
-    resolver: zodResolver(campaignSchema),
+    resolver: getResolver(),
     mode: 'onChange',
     defaultValues: initialCampaignData,
   });
@@ -80,39 +52,25 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
   const formData = watch();
 
   const updateFormData = useCallback((section: keyof CampaignFormData, data: any) => {
-    setValue(section, { ...formData[section], ...data }, { shouldValidate: true });
+    setValue(section, { ...formData[section], ...data }, { shouldValidate: true, shouldDirty: true });
   }, [setValue, formData]);
 
   const validateTab = useCallback(async (tabName: string): Promise<boolean> => {
     setValidatedTabs(prev => new Set(prev).add(tabName));
     
-    let fieldsToValidate: string[] = [];
+    const fieldsToValidate: string[] = [];
     
     switch (tabName) {
       case 'general':
-        fieldsToValidate = [
-          'general.titulo',
-          'general.descripcion', 
-          'general.fechaInicio',
-          'general.fechaFin',
-          'general.grupo',
-          'general.canal',
-          'general.tipoMensaje',
-          'general.plantillaComunicacion'
-        ];
-        
-        if (formData.general.tipoEjecucion === 'PROGRAMADA') {
-          fieldsToValidate.push('general.fechaProgramacion', 'general.horaProgramacion');
-        }
+        fieldsToValidate.push('general');
         break;
-        
       case 'personas':
-        fieldsToValidate = ['personas'];
+        fieldsToValidate.push('personas');
         break;
     }
     
     return await trigger(fieldsToValidate as any);
-  }, [trigger, formData.general.tipoEjecucion]);
+  }, [trigger]);
 
   const validateForm = useCallback(async (): Promise<boolean> => {
     setAttemptedSave(true);
@@ -125,6 +83,24 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     setValidatedTabs(new Set());
     setAttemptedSave(false);
   }, [reset]);
+
+  const getTabErrors = useCallback(() => {
+    const generalErrors = Object.keys(errors.general || {}).length;
+    const personasErrors = Object.keys(errors.personas || {}).length;
+    
+    return { general: generalErrors, personas: personasErrors };
+  }, [errors]);
+
+  const isTabValid = useCallback((tabName: string): boolean => {
+    switch (tabName) {
+      case 'general':
+        return Object.keys(errors.general || {}).length === 0;
+      case 'personas':
+        return Object.keys(errors.personas || {}).length === 0;
+      default:
+        return isValid;
+    }
+  }, [errors, isValid]);
 
   const showErrors = attemptedSave || validatedTabs.size > 0;
 
@@ -140,19 +116,9 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
     showErrors,
     attemptedSave,
     updateFormData,
-  }), [
-    methods,
-    formData,
-    isValid,
-    errors,
-    validateForm,
-    resetForm,
-    validatedTabs,
-    validateTab,
-    showErrors,
-    attemptedSave,
-    updateFormData,
-  ]);
+    getTabErrors,
+    isTabValid,
+  }), [methods, formData, isValid, errors, validateForm, resetForm, validatedTabs, validateTab, showErrors, attemptedSave, updateFormData, getTabErrors, isTabValid]);
 
   return (
     <CampaignFormContext.Provider value={contextValue}>

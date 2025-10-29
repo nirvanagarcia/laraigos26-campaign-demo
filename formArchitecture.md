@@ -20,83 +20,37 @@ Este sistema implementa un patrón avanzado de React Hook Form (RHF) para maneja
 - **Validation Schema**: Validaciones declarativas con Zod
 - **Helper Classes**: Utilities para manipulación de arrays
 
-## Arquitectura del Sistema
-
-### 1. Esquema de Validación (Zod)
-
-```typescript
-// src/schemas/campaignSchema.ts
-export const campaignSchema = z.object({
-  // CABECERA - Campos estáticos
-  general: z.object({
-    titulo: z.string().min(1, "El título es requerido"),
-    // ... otros campos
-  }).refine((data) => {
-    // Validación condicional
-    if (data.tipoEjecucion === 'PROGRAMADA') {
-      return data.fechaProgramacion !== null;
-    }
-    return true;
-  }),
-  
-  // DETALLE - Arrays dinámicos
-  personas: z.object({
-    hasExcelFile: z.boolean(),
-    excelData: excelDataSchema.nullable()
-  }),
-  
-  mensaje: z.object({
-    personalizedFields: z.array(personalizedFieldSchema)
-  })
-});
-
-src/
-├── schemas/
-│   └── campaignSchema.ts              ✅ Zod validation
-├── contexts/
-│   └── CampaignFormContext.tsx        ✅ Form state (optimizado)
-├── hooks/
-│   ├── useFieldArrayManager.ts        ✅ Array management
-│   └── useExcelImport.ts             ✅ (existente)
-├── utils/
-│   └── formHelpers.ts                ✅ (consolidado)
-├── components/
-│   ├── forms/
-│   │   └── PersonalizedFieldsManager.tsx ✅ Dynamic fields
-│   └── tabs/
-│       ├── GeneralTab.tsx            ✅ (existente)
-│       ├── PersonasTab.tsx           ✅ (existente) 
-│       └── MensajeTab.tsx            ✅ (actualizado)
-
+## Estrcutura de Carpetas actual
 
 src/    
 ├── components/
-│   ├── forms/
-│   │   └── PersonalizedFieldsManager.tsx 
 │   ├── previews/
-│   │   ├── EmailPreview.tsx  
-│   │   ├── MessagePreview.tsx 
-│   │   ├── WhatsAppPreview.tsx 
-│   │   ├── index.ts
-│   │   └── SMSPreview.tsx  
+│   │   ├── EmailPreview.tsx           // Preview de emails con iframe seguro
+│   │   ├── MessagePreview.tsx         // Router de previews por tipo de mensaje
+│   │   ├── WhatsAppPreview.tsx        // Preview visual de WhatsApp
+│   │   ├── SMSPreview.tsx             // Preview visual de SMS
+│   │   └── index.ts                   // Barrel exports de previews
 │   ├── tables/
-│   │   ├── ExcelDataTable.tsx  
+│   │   └── ExcelDataTable.tsx         // Tabla con React Table + paginación + filtros
 │   ├── tabs/
-│   │   ├── GeneralTab.tsx  
-│   │   ├── PersonasTab.tsx 
-│   │   └── MensajeTab.tsx  
-│   ├── CampaignAdvanced.tsx
-│   ├── TabPanel.tsx
+│   │   ├── GeneralTab.tsx             // Formulario principal con validación Zod
+│   │   └── PersonasTab.tsx            // Gestión de audiencia + import Excel
+│   ├── CampaignAdvanced.tsx           // Container principal con tabs + validación global
+│   └── TabPanel.tsx                   // Wrapper de Material-UI para tabs
 ├── contexts/
-│   └── CampaignFormContext.tsx  
+│   └── CampaignFormContext.tsx        // Estado global del form + validación por tabs
+├── data/
+│   └── mockData.ts                    // Datos mock para personas y oportunidades
 ├── hooks/
-│   ├── useFieldArrayManager.ts  
-│   └── useExcelImport.ts   
+│   ├── useExcelImport.ts              // Hook para procesar archivos Excel
+│   └── useFieldArrayManager.ts        // Hook para gestión de arrays dinámicos
 ├── schemas/
-│   └── campaignSchema.ts
+│   ├── campaignSchema.ts              // Schema principal Zod + sub-schemas
+│   ├── common.ts                      // Schemas atómicos reutilizables
+│   └── fieldLabels.ts                 // Diccionario centralizado de etiquetas
 ├── types/
-│   ├── campaign.ts  
-│   ├── mockData.ts  
-│   └── excel.ts       
+│   ├── campaign.ts                    // Tipos TypeScript del formulario
+│   ├── mockData.ts                    // Interfaces para datos mock + plantillas
+│   └── excel.ts                       // Tipos para importación Excel
 ├── utils/
-│   └── formHelpers.ts           
+│   └── formHelpers.ts                 // Helpers Zod + buildDefaults + resolvers dinámicos
