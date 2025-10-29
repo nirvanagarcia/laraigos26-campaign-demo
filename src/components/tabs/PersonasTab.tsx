@@ -5,7 +5,7 @@ import { useCampaignForm } from '../../contexts/CampaignFormContext';
 import { useExcelImport } from '../../hooks/useExcelImport';
 import { ExcelDataTable } from '../tables/ExcelDataTable';
 import { personasMockData, oportunidadesMockData } from '../../data/mockData';
-import { getZodError, hasZodError } from '../../utils/formHelpers';
+import { getError, hasError } from '../../utils/formHelpers';
 import { styles } from '../../styles/components/campaigns/PersonasTab.styles';
 
 export const PersonasTab: React.FC = () => {
@@ -24,10 +24,10 @@ export const PersonasTab: React.FC = () => {
     if (file) {
       const data = await processExcelFile(file);
       if (data) {
-        updateFormData('personas', { hasExcelFile: true, excelData: data });
+        updateFormData('personas', { excelData: data });
       }
     } else {
-      updateFormData('personas', { hasExcelFile: false, excelData: null });
+      updateFormData('personas', { excelData: null });
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -41,7 +41,7 @@ export const PersonasTab: React.FC = () => {
   };
 
   const clearData = () => {
-    updateFormData('personas', { hasExcelFile: false, excelData: null });
+    updateFormData('personas', { excelData: null });
   };
 
   const fuente = formData.general.fuente;
@@ -181,19 +181,16 @@ export const PersonasTab: React.FC = () => {
             </styles.UploadSection>
           </Fade>
         )}
-
-        {showErrors && hasZodError(errors, 'personas.hasExcelFile') && (
+        {showErrors && hasError(errors, 'personas.excelData') && (
           <styles.StyledAlert severity="error">
-            {getZodError(errors, 'personas.hasExcelFile') || 'Debe cargar un archivo Excel cuando la fuente es Externa'}
+            {getError(errors, 'personas.excelData')}
           </styles.StyledAlert>
         )}
-
         {error && (
           <styles.StyledAlert severity="error">
             {error}
           </styles.StyledAlert>
         )}
-
         {excelData && (
           <Fade in={true}>
             <styles.DataTableContainer>

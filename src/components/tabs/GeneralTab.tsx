@@ -8,7 +8,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useCampaignForm } from '../../contexts/CampaignFormContext';
 import { mockGrupos, mockCanales, mockPlantillas } from '../../types/mockData';
 import { MessagePreview } from '../previews';
-import { getZodError, hasZodError } from '../../utils/formHelpers';
+import { getError, hasError } from '../../utils/formHelpers';
 import { styles } from '../../styles/components/campaigns/GeneralTab.styles';
 import type { PlantillaComunicacion } from '../../types/mockData';
 
@@ -123,8 +123,8 @@ export const GeneralTab: React.FC = () => {
                   label="Título"
                   placeholder="Asigna un nombre a tu campaña"
                   variant="outlined"
-                  error={showErrors && hasZodError(errors, 'general.titulo')}
-                  helperText={showErrors ? getZodError(errors, 'general.titulo') : undefined}
+                  error={showErrors && hasError(errors, 'general.titulo')}
+                  helperText={showErrors ? getError(errors, 'general.titulo') : undefined}
                 />
               )}
             />
@@ -141,8 +141,8 @@ export const GeneralTab: React.FC = () => {
                   label="Descripción"
                   placeholder="Asigna una breve descripción del uso de tu campaña"
                   variant="outlined"
-                  error={showErrors && hasZodError(errors, 'general.descripcion')}
-                  helperText={showErrors ? getZodError(errors, 'general.descripcion') : undefined}
+                  error={showErrors && hasError(errors, 'general.descripcion')}
+                  helperText={showErrors ? getError(errors, 'general.descripcion') : undefined}
                 />
               )}
             />
@@ -161,8 +161,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          error: showErrors && hasZodError(errors, 'general.fechaInicio'),
-                          helperText: showErrors ? getZodError(errors, 'general.fechaInicio') : "Selecciona la fecha inicio de vigencia de tu campaña",
+                          error: showErrors && hasError(errors, 'general.fechaInicio'),
+                          helperText: showErrors ? getError(errors, 'general.fechaInicio') : "Selecciona la fecha inicio de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -184,8 +184,8 @@ export const GeneralTab: React.FC = () => {
                         textField: {
                           fullWidth: true,
                           variant: "outlined",
-                          error: showErrors && hasZodError(errors, 'general.fechaFin'),
-                          helperText: showErrors ? getZodError(errors, 'general.fechaFin') : "Selecciona la fecha fin de vigencia de tu campaña",
+                          error: showErrors && hasError(errors, 'general.fechaFin'),
+                          helperText: showErrors ? getError(errors, 'general.fechaFin') : "Selecciona la fecha fin de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -201,7 +201,7 @@ export const GeneralTab: React.FC = () => {
                   name="fuente"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth error={showErrors && hasZodError(errors, 'general.fuente')}>
+                    <styles.StyledFormControl fullWidth error={showErrors && hasError(errors, 'general.fuente')}>
                       <InputLabel>Fuente</InputLabel>
                       <Select {...field} label="Fuente">
                         {fuenteOptions.map((option) => (
@@ -213,10 +213,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.fuente') && (
-                        <FormHelperText>{getZodError(errors, 'general.fuente')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.fuente') && (
+                        <FormHelperText>{getError(errors, 'general.fuente')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.fuente')) && (
+                      {(!showErrors || !getError(errors, 'general.fuente')) && (
                         <FormHelperText>
                           Elige la fuente de origen de datos con la cual se completará a los destinatarios de tu campaña
                         </FormHelperText>
@@ -231,7 +231,7 @@ export const GeneralTab: React.FC = () => {
                   name="tipoEjecucion"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth error={showErrors && hasZodError(errors, 'general.tipoEjecucion')}>
+                    <styles.StyledFormControl fullWidth error={showErrors && hasError(errors, 'general.tipoEjecucion')}>
                       <InputLabel>Tipo de ejecución</InputLabel>
                       <Select {...field} label="Tipo de ejecución">
                         {tipoEjecucionOptions.map((option) => (
@@ -243,10 +243,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.tipoEjecucion') && (
-                        <FormHelperText>{getZodError(errors, 'general.tipoEjecucion')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.tipoEjecucion') && (
+                        <FormHelperText>{getError(errors, 'general.tipoEjecucion')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.tipoEjecucion')) && (
+                      {(!showErrors || !getError(errors, 'general.tipoEjecucion')) && (
                         <FormHelperText>
                           Define la programación de ejecución de tu campaña
                         </FormHelperText>
@@ -276,8 +276,8 @@ export const GeneralTab: React.FC = () => {
                             textField: {
                               fullWidth: true,
                               variant: "outlined",
-                              error: showErrors && hasZodError(errors, 'general.fechaProgramacion'),
-                              helperText: showErrors ? getZodError(errors, 'general.fechaProgramacion') : undefined,
+                              error: showErrors && hasError(errors, 'general.fechaProgramacion'),
+                              helperText: showErrors ? getError(errors, 'general.fechaProgramacion') : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -306,8 +306,8 @@ export const GeneralTab: React.FC = () => {
                             textField: {
                               fullWidth: true,
                               variant: "outlined",
-                              error: showErrors && hasZodError(errors, 'general.horaProgramacion'),
-                              helperText: showErrors ? getZodError(errors, 'general.horaProgramacion') : undefined,
+                              error: showErrors && hasError(errors, 'general.horaProgramacion'),
+                              helperText: showErrors ? getError(errors, 'general.horaProgramacion') : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -325,7 +325,7 @@ export const GeneralTab: React.FC = () => {
                   name="grupo"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth error={showErrors && hasZodError(errors, 'general.grupo')}>
+                    <styles.StyledFormControl fullWidth error={showErrors && hasError(errors, 'general.grupo')}>
                       <InputLabel>Grupo</InputLabel>
                       <Select {...field} label="Grupo">
                         {mockGrupos.map((grupo) => (
@@ -341,10 +341,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.grupo') && (
-                        <FormHelperText>{getZodError(errors, 'general.grupo')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.grupo') && (
+                        <FormHelperText>{getError(errors, 'general.grupo')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.grupo')) && (
+                      {(!showErrors || !getError(errors, 'general.grupo')) && (
                         <FormHelperText>
                           Asigna un grupo de atención de asesores a tu campaña
                         </FormHelperText>
@@ -359,7 +359,7 @@ export const GeneralTab: React.FC = () => {
                   name="canal"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth error={showErrors && hasZodError(errors, 'general.canal')}>
+                    <styles.StyledFormControl fullWidth error={showErrors && hasError(errors, 'general.canal')}>
                       <InputLabel>Canal</InputLabel>
                       <Select {...field} label="Canal">
                         {mockCanales.filter(c => c.activo).map((canal) => (
@@ -375,10 +375,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.canal') && (
-                        <FormHelperText>{getZodError(errors, 'general.canal')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.canal') && (
+                        <FormHelperText>{getError(errors, 'general.canal')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.canal')) && (
+                      {(!showErrors || !getError(errors, 'general.canal')) && (
                         <FormHelperText>
                           Selecciona el canal de envío de tu campaña
                         </FormHelperText>
@@ -395,7 +395,7 @@ export const GeneralTab: React.FC = () => {
                   name="tipoMensaje"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth disabled={tiposMensajeSoportados.length === 0} error={showErrors && hasZodError(errors, 'general.tipoMensaje')}>
+                    <styles.StyledFormControl fullWidth disabled={tiposMensajeSoportados.length === 0} error={showErrors && hasError(errors, 'general.tipoMensaje')}>
                       <InputLabel>Tipo de Mensaje</InputLabel>
                       <Select {...field} label="Tipo de Mensaje" value={tiposMensajeSoportados.includes(field.value as any) ? field.value : ''}>
                         {tipoMensajeOptions.filter(option => tiposMensajeSoportados.includes(option.value as any)).map((option) => (
@@ -409,10 +409,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.tipoMensaje') && (
-                        <FormHelperText>{getZodError(errors, 'general.tipoMensaje')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.tipoMensaje') && (
+                        <FormHelperText>{getError(errors, 'general.tipoMensaje')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.tipoMensaje')) && (
+                      {(!showErrors || !getError(errors, 'general.tipoMensaje')) && (
                         <FormHelperText>
                           {tiposMensajeSoportados.length === 0 ? 'Primero selecciona un canal' : `Tipos disponibles para el canal seleccionado: ${tiposMensajeSoportados.join(', ')}`}
                         </FormHelperText>
@@ -427,7 +427,7 @@ export const GeneralTab: React.FC = () => {
                   name="plantillaComunicacion"
                   control={control}
                   render={({ field }) => (
-                    <styles.StyledFormControl fullWidth disabled={plantillasFiltradas.length === 0} error={showErrors && hasZodError(errors, 'general.plantillaComunicacion')}>
+                    <styles.StyledFormControl fullWidth disabled={plantillasFiltradas.length === 0} error={showErrors && hasError(errors, 'general.plantillaComunicacion')}>
                       <InputLabel>Plantilla de Comunicación</InputLabel>
                       <Select {...field} label="Plantilla de Comunicación">
                         {plantillasFiltradas.map((plantilla) => (
@@ -446,10 +446,10 @@ export const GeneralTab: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {showErrors && getZodError(errors, 'general.plantillaComunicacion') && (
-                        <FormHelperText>{getZodError(errors, 'general.plantillaComunicacion')}</FormHelperText>
+                      {showErrors && getError(errors, 'general.plantillaComunicacion') && (
+                        <FormHelperText>{getError(errors, 'general.plantillaComunicacion')}</FormHelperText>
                       )}
-                      {(!showErrors || !getZodError(errors, 'general.plantillaComunicacion')) && (
+                      {(!showErrors || !getError(errors, 'general.plantillaComunicacion')) && (
                         <FormHelperText>
                           {plantillasFiltradas.length === 0 ? 'Primero selecciona un tipo de mensaje' : `${plantillasFiltradas.length} plantillas disponibles para ${watchedValues.tipoMensaje}`}
                         </FormHelperText>

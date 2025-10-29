@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ReactNode } from 'react';
 import { campaignSchema, type CampaignFormData } from '../schemas/campaignSchema';
-import { createSafeDefaults, getResolver } from '../utils/formHelpers';
+import { getCampaignResolver, createCampaignDefaults } from '../utils/campaignFormHelpers';
 
-const initialCampaignData: CampaignFormData = createSafeDefaults();
+const initialCampaignData: CampaignFormData = createCampaignDefaults();
 
 interface CampaignFormContextType {
   methods: UseFormReturn<CampaignFormData>;
@@ -43,7 +43,7 @@ export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ chil
   const [attemptedSave, setAttemptedSave] = useState(false);
 
   const methods = useForm<CampaignFormData>({
-    resolver: getResolver(),
+    resolver: getCampaignResolver(),
     mode: 'onChange',
     defaultValues: initialCampaignData,
   });

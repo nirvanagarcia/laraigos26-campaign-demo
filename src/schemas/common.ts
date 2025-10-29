@@ -1,38 +1,76 @@
 import { z } from 'zod';
 import { fieldLabels, type FieldName } from './fieldLabels';
 
-export const requiredString = (name: FieldName) => z.string().min(1, `${fieldLabels[name]} es requerido`);
+const baseSchema = (
+  type: 'string' | 'number' | 'date' | 'select' | 'boolean' | 'array',
+  required: boolean,
+  name?: FieldName,
+  subschema?: z.ZodTypeAny
+) => {
+  switch (type) {
+    case 'string':
+    case 'select':
+      return required
+        ? z.string().min(1, `${fieldLabels[name!]} es requerido`)
+        : z.string().optional();
 
-export const requiredDate = (name: FieldName) => z.date({ 
-  required_error: `${fieldLabels[name]} es requerida`,
-  invalid_type_error: `${fieldLabels[name]} debe ser una fecha válida`
-}).refine(date => date !== null && date !== undefined, {
-  message: `${fieldLabels[name]} es requerida`
-});
+    case 'number':
+      return required
+        ? z.coerce
+            .number({ invalid_type_error: `${fieldLabels[name!]} debe ser un número válido` })
+            .refine(val => !isNaN(val), `${fieldLabels[name!]} debe ser numérico`)
+        : z.coerce.number().optional();
 
-export const optionalString = () => z.string().optional();
+    case 'date':
+      return required
+        ? z.coerce.date({
+            required_error: `${fieldLabels[name!]} es requerida`,
+            invalid_type_error: `${fieldLabels[name!]} debe ser una fecha válida`,
+          })
+        : z
+            .coerce
+            .date({
+              invalid_type_error: name
+                ? `${fieldLabels[name]} debe ser una fecha válida`
+                : 'Fecha inválida',
+            })
+            .nullable()
+            .optional();
 
-export const requiredSelect = (name: FieldName) => z.string().min(1, `Selecciona ${fieldLabels[name].toLowerCase()}`);
+    case 'boolean':
+      return required ? z.boolean() : z.boolean().optional();
 
-export const trimmedString = (name: FieldName) => z.string().transform(v => v.trim()).pipe(z.string().min(1, `${fieldLabels[name]} es requerido`));
+    case 'array':
+      const baseArray = z.array(subschema || z.any());
+      return required
+        ? baseArray.min(1, `${fieldLabels[name!]} debe tener al menos un elemento`)
+        : baseArray.optional();
 
-export const upperCaseString = (name: FieldName) => z.string().transform(v => v.toUpperCase().trim()).pipe(z.string().min(1, `${fieldLabels[name]} es requerido`));
-
-export const createErrorMap = (): z.ZodErrorMap => (issue, ctx) => {
-  switch (issue.code) {
-    case z.ZodIssueCode.invalid_type:
-      if (issue.expected === 'string') return { message: 'Campo requerido' };
-      if (issue.expected === 'date') return { message: 'Fecha inválida' };
-      break;
-    case z.ZodIssueCode.too_small:
-      if (issue.type === 'string') return { message: 'Campo requerido' };
-      break;
-    case z.ZodIssueCode.invalid_enum_value:
-      return { message: 'Selecciona una opción válida' };
-    case z.ZodIssueCode.custom:
-      return { message: issue.message || 'Campo requerido' };
+    default:
+      throw new Error(`Tipo de campo no soportado: ${type}`);
   }
-  return { message: ctx.defaultError };
 };
 
-z.setErrorMap(createErrorMap());
+export const required = (
+  type: 'string' | 'number' | 'date' | 'select' | 'boolean' | 'array',
+  name: FieldName,
+  subschema?: z.ZodTypeAny
+) => baseSchema(type, true, name, subschema);
+
+export const optional = (
+  type: 'string' | 'number' | 'date' | 'select' | 'boolean' | 'array',
+  name: FieldName,
+  subschema?: z.ZodTypeAny
+) => baseSchema(type, false, name, subschema);
+
+export const buildFieldIssue = (
+  fieldName: FieldName,
+  path: string[],
+  isRequired: boolean = true
+) => ({
+  path,
+  code: z.ZodIssueCode.custom,
+  message: `${fieldLabels[fieldName]} es ${
+    isRequired ? 'requerida' : 'requerido'
+  }`,
+});

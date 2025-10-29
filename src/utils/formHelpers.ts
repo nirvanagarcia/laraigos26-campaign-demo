@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { FieldErrors } from 'react-hook-form';
 import { z } from 'zod';
-import { campaignSchema, generalSchema, personasSchema, type CampaignFormData } from '../schemas/campaignSchema';
 
-export const getZodError = <T>(errors: FieldErrors<T>, path: string): string | undefined => {
+export const getError = <T>(errors: FieldErrors<T>, path: string): string | undefined => {
   const keys = path.split('.');
   let current: any = errors;
   for (const key of keys) {
@@ -12,8 +11,8 @@ export const getZodError = <T>(errors: FieldErrors<T>, path: string): string | u
   return current?.message;
 };
 
-export const hasZodError = <T>(errors: FieldErrors<T>, path: string): boolean => {
-  return !!getZodError(errors, path);
+export const hasError = <T>(errors: FieldErrors<T>, path: string): boolean => {
+  return !!getError(errors, path);
 };
 
 export const buildDefaults = (schema: z.ZodTypeAny): any => {
@@ -96,16 +95,10 @@ export const buildDefaults = (schema: z.ZodTypeAny): any => {
   }
 };
 
-export const getResolver = (tab?: 'general' | 'personas') => {
-  switch (tab) {
-    case 'general':
-      return zodResolver(z.object({ general: generalSchema }));
-    case 'personas':
-      return zodResolver(z.object({ personas: personasSchema }));
-    default:
-      return zodResolver(campaignSchema);
-  }
-};
+export const getFormFieldProps = <T>(errors: FieldErrors<T>, name: string, showErrors: boolean) => ({
+  error: showErrors && hasError(errors, name),
+  helperText: showErrors ? getError(errors, name) : undefined
+});
 
 export class FormArrayHelper<T = any> {
   constructor(private getValues: (path?: string) => any, private setValue: (path: string, value: any) => void) {}
@@ -136,66 +129,3 @@ export class FormArrayHelper<T = any> {
     this.setValue(arrayPath, updatedArray);
   }
 }
-
-export const transformFormDataForSubmission = (formData: CampaignFormData) => {
-  return {
-    ...formData,
-    general: {
-      ...formData.general,
-      fechaInicio: formData.general.fechaInicio?.toISOString(),
-      fechaFin: formData.general.fechaFin?.toISOString(),
-      fechaProgramacion: formData.general.fechaProgramacion?.toISOString(),
-    },
-  };
-};
-
-export const validateConditionalFields = (formData: CampaignFormData): string[] => {
-  const errors: string[] = [];
-  
-  if (formData.general.tipoEjecucion === 'PROGRAMADA') {
-    if (!formData.general.fechaProgramacion) errors.push('Fecha de programación requerida');
-    if (!formData.general.horaProgramacion) errors.push('Hora de programación requerida');
-  }
-  
-  if (formData.general.fuente === 'EXTERNA' && !formData.personas.hasExcelFile) {
-    errors.push('Archivo Excel requerido para fuente externa');
-  }
-  
-  return errors;
-};
-
-export const getFormFieldProps = <T>(errors: FieldErrors<T>, name: string, showErrors: boolean) => ({
-  error: showErrors && hasZodError(errors, name),
-  helperText: showErrors ? getZodError(errors, name) : undefined
-});
-
-export const createSafeDefaults = (): CampaignFormData => {
-  return {
-    general: {
-      titulo: '',
-      descripcion: '',
-      fechaInicio: null,
-      fechaFin: null,
-      fuente: 'EXTERNA',
-      tipoEjecucion: 'MANUAL',
-      fechaProgramacion: null,
-      horaProgramacion: '',
-      grupo: '',
-      canal: '',
-      tipoMensaje: '',
-      plantillaComunicacion: '',
-    },
-    personas: {
-      targetAudience: '',
-      demographics: {
-        ageRange: [18, 65],
-        gender: '',
-        location: [],
-      },
-      segmentation: [],
-      estimatedReach: 0,
-      hasExcelFile: false,
-      excelData: null,
-    }
-  };
-};
