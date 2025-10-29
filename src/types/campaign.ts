@@ -40,14 +40,6 @@ export interface CampaignData {
     } | null;
   };
   
-  mensaje: {
-    title: string;
-    content: string;
-    tone: string;
-    channels: string[];
-    callToAction: string;
-    personalizedFields: string[];
-  };
 }
 
 export interface CampaignValidationErrors {

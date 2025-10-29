@@ -105,6 +105,13 @@ export const GeneralTab: React.FC = () => {
     { value: 'HTML', label: 'HTML', icon: '📨' },
   ], []);
 
+  const getErrorMessage = (error: any): string => {
+    if (typeof error === 'string') return error;
+    if (error?.message) return error.message;
+    if (typeof error === 'object') return JSON.stringify(error);
+    return 'Error de validación';
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box 
@@ -184,7 +191,7 @@ export const GeneralTab: React.FC = () => {
                   placeholder="Asigna un nombre a tu campaña"
                   variant="outlined"
                   error={showErrors && !!errors.general?.titulo}
-                  helperText={showErrors ? errors.general?.titulo : undefined}
+                  helperText={showErrors && errors.general?.titulo ? getErrorMessage(errors.general.titulo) : undefined}
                   sx={{
                     maxWidth: '100%',
                     '& .MuiOutlinedInput-root': {
@@ -209,7 +216,7 @@ export const GeneralTab: React.FC = () => {
                   placeholder="Asigna una breve descripción del uso de tu campaña"
                   variant="outlined"
                   error={showErrors && !!errors.general?.descripcion}
-                  helperText={showErrors ? errors.general?.descripcion : undefined}
+                  helperText={showErrors && errors.general?.descripcion ? getErrorMessage(errors.general.descripcion) : undefined}
                   sx={{
                     maxWidth: '100%',
                     '& .MuiOutlinedInput-root': {
@@ -235,7 +242,7 @@ export const GeneralTab: React.FC = () => {
                           fullWidth: true,
                           variant: "outlined",
                           error: showErrors && !!errors.general?.fechaInicio,
-                          helperText: showErrors && errors.general?.fechaInicio ? errors.general.fechaInicio : "Selecciona la fecha inicio de vigencia de tu campaña",
+                          helperText: showErrors && errors.general?.fechaInicio ? getErrorMessage(errors.general.fechaInicio) : "Selecciona la fecha inicio de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -258,7 +265,7 @@ export const GeneralTab: React.FC = () => {
                           fullWidth: true,
                           variant: "outlined",
                           error: showErrors && !!errors.general?.fechaFin,
-                          helperText: showErrors && errors.general?.fechaFin ? errors.general.fechaFin : "Selecciona la fecha fin de vigencia de tu campaña",
+                          helperText: showErrors && errors.general?.fechaFin ? getErrorMessage(errors.general.fechaFin) : "Selecciona la fecha fin de vigencia de tu campaña",
                           sx: { maxWidth: '100%' }
                         }
                       }}
@@ -287,7 +294,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.fuente && (
-                        <FormHelperText>{errors.general.fuente}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.fuente)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.fuente) && (
                         <FormHelperText>
@@ -317,7 +324,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.tipoEjecucion && (
-                        <FormHelperText>{errors.general.tipoEjecucion}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.tipoEjecucion)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.tipoEjecucion) && (
                         <FormHelperText>
@@ -356,7 +363,7 @@ export const GeneralTab: React.FC = () => {
                               fullWidth: true,
                               variant: "outlined",
                               error: showErrors && !!errors.general?.fechaProgramacion,
-                              helperText: showErrors ? errors.general?.fechaProgramacion : undefined,
+                              helperText: showErrors && errors.general?.fechaProgramacion ? getErrorMessage(errors.general.fechaProgramacion) : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -390,7 +397,7 @@ export const GeneralTab: React.FC = () => {
                               fullWidth: true,
                               variant: "outlined",
                               error: showErrors && !!errors.general?.horaProgramacion,
-                              helperText: showErrors ? errors.general?.horaProgramacion : undefined,
+                              helperText: showErrors && errors.general?.horaProgramacion ? getErrorMessage(errors.general.horaProgramacion) : undefined,
                               sx: { maxWidth: '100%' }
                             }
                           }}
@@ -443,7 +450,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.grupo && (
-                        <FormHelperText>{errors.general.grupo}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.grupo)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.grupo) && (
                         <FormHelperText>
@@ -495,7 +502,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.canal && (
-                        <FormHelperText>{errors.general.canal}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.canal)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.canal) && (
                         <FormHelperText>
@@ -540,7 +547,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.tipoMensaje && (
-                        <FormHelperText>{errors.general.tipoMensaje}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.tipoMensaje)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.tipoMensaje) && (
                         <FormHelperText>
@@ -602,7 +609,7 @@ export const GeneralTab: React.FC = () => {
                         ))}
                       </Select>
                       {showErrors && errors.general?.plantillaComunicacion && (
-                        <FormHelperText>{errors.general.plantillaComunicacion}</FormHelperText>
+                        <FormHelperText>{getErrorMessage(errors.general.plantillaComunicacion)}</FormHelperText>
                       )}
                       {(!showErrors || !errors.general?.plantillaComunicacion) && (
                         <FormHelperText>
@@ -621,7 +628,7 @@ export const GeneralTab: React.FC = () => {
         </Paper>
 
         <Card 
-         sx={{
+        sx={{
             width: '45%',
             minWidth: 400,
             maxHeight: 'calc(100vh - 200px)',
@@ -670,7 +677,6 @@ export const GeneralTab: React.FC = () => {
                 <MessagePreview plantilla={selectedPlantilla} />
               </Box>
             </Box>
-
           </CardContent>
         </Card>
       </Box>

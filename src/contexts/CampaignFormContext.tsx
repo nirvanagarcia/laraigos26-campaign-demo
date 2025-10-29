@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import type { ReactNode } from 'react';
-import type { CampaignData, CampaignFormContextType, CampaignValidationErrors } from '../types/campaign';
+import { campaignSchema, type CampaignFormData } from '../schemas/campaignSchema';
 
-const initialCampaignData: CampaignData = {
+const initialCampaignData: CampaignFormData = {
   general: {
     titulo: '',
     descripcion: '',
@@ -16,13 +19,6 @@ const initialCampaignData: CampaignData = {
     canal: '',
     tipoMensaje: '',
     plantillaComunicacion: '',
-    name: '',
-    category: '',
-    startDate: null,
-    endDate: null,
-    budget: 0,
-    priority: 'medium',
-    tags: [],
   },
   personas: {
     targetAudience: '',
@@ -35,16 +31,26 @@ const initialCampaignData: CampaignData = {
     estimatedReach: 0,
     hasExcelFile: false,
     excelData: null,
-  },
-  mensaje: {
-    title: '',
-    content: '',
-    tone: 'professional',
-    channels: [],
-    callToAction: '',
-    personalizedFields: [],
-  },
+  }
 };
+
+interface CampaignFormContextType {
+  methods: UseFormReturn<CampaignFormData>;
+  
+  formData: CampaignFormData;
+  isValid: boolean;
+  errors: any;
+  
+  validateForm: () => Promise<boolean>;
+  resetForm: () => void;
+  
+  validatedTabs: Set<string>;
+  validateTab: (tabName: string) => Promise<boolean>;
+  showErrors: boolean;
+  attemptedSave: boolean;
+  
+  updateFormData: (section: keyof CampaignFormData, data: any) => void;
+}
 
 const CampaignFormContext = createContext<CampaignFormContextType | undefined>(undefined);
 
@@ -61,140 +67,95 @@ interface CampaignFormProviderProps {
 }
 
 export const CampaignFormProvider: React.FC<CampaignFormProviderProps> = ({ children }) => {
-  const [formData, setFormData] = useState<CampaignData>(initialCampaignData);
   const [validatedTabs, setValidatedTabs] = useState<Set<string>>(new Set());
   const [attemptedSave, setAttemptedSave] = useState(false);
 
-  const updateFormData = useCallback((section: keyof CampaignData, data: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        ...data,
-      },
-    }));
-  }, []);
+  const methods = useForm<CampaignFormData>({
+    resolver: zodResolver(campaignSchema),
+    mode: 'onChange',
+    defaultValues: initialCampaignData,
+  });
 
-  const resetForm = useCallback(() => {
-    setFormData(initialCampaignData);
-    setValidatedTabs(new Set());
-    setAttemptedSave(false);
-  }, []);
+  const { watch, trigger, reset, setValue, formState: { errors, isValid } } = methods;
+  const formData = watch();
 
-  const validateTab = useCallback((tabName: string): boolean => {
+  const updateFormData = useCallback((section: keyof CampaignFormData, data: any) => {
+    setValue(section, { ...formData[section], ...data }, { shouldValidate: true });
+  }, [setValue, formData]);
+
+  const validateTab = useCallback(async (tabName: string): Promise<boolean> => {
     setValidatedTabs(prev => new Set(prev).add(tabName));
     
-    const tabErrors = getTabValidationErrors(tabName);
-    return Object.keys(tabErrors).length === 0;
-  }, [formData]);
-
-  const getTabValidationErrors = useCallback((tabName: string) => {
-    const tabErrors: any = {};
-
-    if (tabName === 'general') {
-      if (!formData.general.titulo?.trim()) {
-        tabErrors.titulo = 'El título es requerido';
-      }
-      if (!formData.general.descripcion?.trim()) {
-        tabErrors.descripcion = 'La descripción es requerida';
-      }
-      if (!formData.general.fechaInicio) {
-        tabErrors.fechaInicio = 'La fecha de inicio es requerida';
-      }
-      if (!formData.general.fechaFin) {
-        tabErrors.fechaFin = 'La fecha de fin es requerida';
-      }
-      if (!formData.general.fuente) {
-        tabErrors.fuente = 'La fuente es requerida';
-      }
-      if (!formData.general.tipoEjecucion) {
-        tabErrors.tipoEjecucion = 'El tipo de ejecución es requerido';
-      }
-      if (formData.general.tipoEjecucion === 'PROGRAMADA') {
-        if (!formData.general.fechaProgramacion) {
-          tabErrors.fechaProgramacion = 'La fecha de programación es requerida';
+    let fieldsToValidate: string[] = [];
+    
+    switch (tabName) {
+      case 'general':
+        fieldsToValidate = [
+          'general.titulo',
+          'general.descripcion', 
+          'general.fechaInicio',
+          'general.fechaFin',
+          'general.grupo',
+          'general.canal',
+          'general.tipoMensaje',
+          'general.plantillaComunicacion'
+        ];
+        
+        if (formData.general.tipoEjecucion === 'PROGRAMADA') {
+          fieldsToValidate.push('general.fechaProgramacion', 'general.horaProgramacion');
         }
-        if (!formData.general.horaProgramacion?.trim()) {
-          tabErrors.horaProgramacion = 'La hora de programación es requerida';
-        }
-      }
-      if (!formData.general.grupo) {
-        tabErrors.grupo = 'El grupo es requerido';
-      }
-      if (!formData.general.canal) {
-        tabErrors.canal = 'El canal es requerido';
-      }
-      if (!formData.general.tipoMensaje) {
-        tabErrors.tipoMensaje = 'El tipo de mensaje es requerido';
-      }
-      if (!formData.general.plantillaComunicacion) {
-        tabErrors.plantillaComunicacion = 'La plantilla de comunicación es requerida';
-      }
+        break;
+        
+      case 'personas':
+        fieldsToValidate = ['personas'];
+        break;
     }
+    
+    return await trigger(fieldsToValidate as any);
+  }, [trigger, formData.general.tipoEjecucion]);
 
-    if (tabName === 'personas') {
-      if (formData.general.fuente === 'EXTERNA' && !formData.personas.hasExcelFile) {
-        tabErrors.hasExcelFile = 'Debe cargar un archivo Excel cuando la fuente es Externa';
-      }
-    }
-
-    return tabErrors;
-  }, [formData]);
-
-  const errors = useMemo((): CampaignValidationErrors => {
-    const validationErrors: CampaignValidationErrors = {
-      general: {},
-      personas: {},
-    };
-
-    if (attemptedSave || validatedTabs.has('general')) {
-      validationErrors.general = getTabValidationErrors('general');
-    }
-
-    if (attemptedSave || validatedTabs.has('personas')) {
-      validationErrors.personas = getTabValidationErrors('personas');
-    }
-
-    return validationErrors;
-  }, [formData, validatedTabs, attemptedSave, getTabValidationErrors]);
-
-  const validateForm = useCallback((): boolean => {
+  const validateForm = useCallback(async (): Promise<boolean> => {
     setAttemptedSave(true);
-    setValidatedTabs(new Set(['general', 'personas', 'mensaje']));
-    
-    const generalErrors = getTabValidationErrors('general');
-    const personasErrors = getTabValidationErrors('personas');
-    
-    const hasGeneralErrors = Object.keys(generalErrors).length > 0;
-    const hasPersonasErrors = Object.keys(personasErrors).length > 0;
-    
-    return !hasGeneralErrors && !hasPersonasErrors;
-  }, [getTabValidationErrors]);
+    setValidatedTabs(new Set(['general', 'personas']));
+    return await trigger();
+  }, [trigger]);
+
+  const resetForm = useCallback(() => {
+    reset(initialCampaignData);
+    setValidatedTabs(new Set());
+    setAttemptedSave(false);
+  }, [reset]);
 
   const showErrors = attemptedSave || validatedTabs.size > 0;
 
-  const isFormComplete = useMemo(() => {
-    const allGeneralErrors = getTabValidationErrors('general');
-    const allPersonasErrors = getTabValidationErrors('personas');
-    
-    return Object.keys(allGeneralErrors).length === 0 && Object.keys(allPersonasErrors).length === 0;
-  }, [formData, getTabValidationErrors]);
+  const contextValue = useMemo((): CampaignFormContextType => ({
+    methods,
+    formData,
+    isValid,
+    errors,
+    validateForm,
+    resetForm,
+    validatedTabs,
+    validateTab,
+    showErrors,
+    attemptedSave,
+    updateFormData,
+  }), [
+    methods,
+    formData,
+    isValid,
+    errors,
+    validateForm,
+    resetForm,
+    validatedTabs,
+    validateTab,
+    showErrors,
+    attemptedSave,
+    updateFormData,
+  ]);
 
   return (
-    <CampaignFormContext.Provider
-      value={{
-        formData,
-        updateFormData,
-        resetForm,
-        isValid: isFormComplete,
-        errors,
-        validateForm,
-        showErrors,
-        validatedTabs,
-        validateTab,
-        attemptedSave,
-      }}
-    >
+    <CampaignFormContext.Provider value={contextValue}>
       {children}
     </CampaignFormContext.Provider>
   );

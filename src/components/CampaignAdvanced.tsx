@@ -23,7 +23,6 @@ import { CampaignFormProvider, useCampaignForm } from '../contexts/CampaignFormC
 import { TabPanel, a11yProps } from './TabPanel';
 import { GeneralTab } from './tabs/GeneralTab';
 import { PersonasTab } from './tabs/PersonasTab';
-import { MensajeTab } from './tabs/MensajeTab';
 
 const CampaignTabsContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -31,7 +30,7 @@ const CampaignTabsContent: React.FC = () => {
   const { formData, resetForm, isValid, errors, validateForm, validateTab, showErrors } = useCampaignForm();
 
   const getTabName = (tabIndex: number): string => {
-    const tabNames = ['general', 'personas', 'mensaje'];
+    const tabNames = ['general', 'personas'];
     return tabNames[tabIndex] || 'general';
   };
 
@@ -70,7 +69,6 @@ const CampaignTabsContent: React.FC = () => {
     return {
       general: generalErrors,
       personas: personasErrors,
-      mensaje: 0,
     };
   };
 
@@ -233,20 +231,7 @@ const CampaignTabsContent: React.FC = () => {
               icon={<Box sx={{ fontSize: '1.2rem' }}>🎭</Box>}
               iconPosition="start"
             />
-            <Tab 
-              label={
-                <Badge 
-                  badgeContent={tabErrors.mensaje} 
-                  color="error" 
-                  invisible={tabErrors.mensaje === 0}
-                >
-                  💬 Mensaje
-                </Badge>
-              }
-              {...a11yProps(2)}
-              icon={<Box sx={{ fontSize: '1.2rem' }}>✨</Box>}
-              iconPosition="start"
-            />
+           
           </Tabs>
         </Paper>
 
@@ -256,10 +241,6 @@ const CampaignTabsContent: React.FC = () => {
         
         <TabPanel value={activeTab} index={1}>
           <PersonasTab />
-        </TabPanel>
-        
-        <TabPanel value={activeTab} index={2}>
-          <MensajeTab />
         </TabPanel>
 
         {/* Panel de errores de validación */}
@@ -302,7 +283,7 @@ const CampaignTabsContent: React.FC = () => {
                           fontSize: '0.8rem',
                         }}
                       >
-                        {message}
+                        {String(message?.message || message || 'Error de validación')}
                       </Alert>
                     ))}
                   </Box>
@@ -325,7 +306,7 @@ const CampaignTabsContent: React.FC = () => {
                           fontSize: '0.8rem',
                         }}
                       >
-                        {message}
+                        {String(message?.message || message || 'Error de validación')}
                       </Alert>
                     ))}
                   </Box>

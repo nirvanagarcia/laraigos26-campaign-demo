@@ -28,7 +28,6 @@ export const PersonasTab: React.FC = () => {
     processExcelFile, 
   } = useExcelImport();
 
-  // Usar los datos del contexto en lugar del hook local
   const excelData = formData.personas.excelData;
 
   const handleFileUpload = () => {
@@ -45,6 +44,11 @@ export const PersonasTab: React.FC = () => {
           excelData: data
         });
       }
+    } else {
+      updateFormData('personas', { 
+        hasExcelFile: false,
+        excelData: null
+      });
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -69,14 +73,6 @@ export const PersonasTab: React.FC = () => {
       excelData: null
     });
   };
-
-  React.useEffect(() => {
-    if (!excelData) {
-      updateFormData('personas', { hasExcelFile: false });
-    } else {
-      updateFormData('personas', { hasExcelFile: true });
-    }
-  }, [excelData, updateFormData]);
 
   const fuente = formData.general.fuente;
 
@@ -340,10 +336,9 @@ export const PersonasTab: React.FC = () => {
           </Fade>
         )}
 
-        {/* Mostrar error de validación si existe */}
         {showErrors && errors.personas?.hasExcelFile && (
           <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }}>
-            {errors.personas.hasExcelFile}
+            {String(errors.personas.hasExcelFile.message || 'Debe cargar un archivo Excel cuando la fuente es Externa')}
           </Alert>
         )}
 
