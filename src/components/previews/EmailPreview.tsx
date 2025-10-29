@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Chip, Typography } from '@mui/material';
+import * as styles from '../../styles/components/campaigns/EmailPreview.styles';
 import type { PlantillaComunicacion } from '../../types/mockData';
 
 interface EmailPreviewProps {
@@ -60,104 +60,75 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({ plantilla }) => {
   }, [plantilla.id, plantilla.tipo]);
 
   return (
-    <Box sx={{
-      background: '#fff',
-      border: '1px solid #ccc',
-      borderRadius: '10px',
-      overflow: 'hidden',
-      width: '100%',
-    }}>
-      <Box sx={{ 
-        p: 2, 
-        borderBottom: '1px solid #e0e0e0', 
-        bgcolor: '#fcfcfc',
-        fontFamily: 'Roboto, sans-serif',
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+    <styles.EmailContainer>
+      <styles.EmailHeader>
+        <styles.EmailInfoRow>
+          <styles.FieldLabel variant="caption">
             Para
-          </Typography>
-          <Chip 
+          </styles.FieldLabel>
+          <styles.RecipientChip 
             label="soporte@vcaperu.com" 
             size="small" 
-            sx={{ bgcolor: '#eeeeee', color: '#333', fontSize: '0.8rem' }} 
           />
-        </Box>
+        </styles.EmailInfoRow>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5, color: 'text.secondary' }}>
-          <Typography variant="caption" sx={{ minWidth: '50px' }}>
+        <styles.EmailCCRow>
+          <styles.FieldLabel variant="caption">
             CC
-          </Typography>
-          <Chip 
+          </styles.FieldLabel>
+          <styles.CCChip 
             label="nirvana@laraigo.com" 
             size="small" 
             variant="outlined"
-            sx={{ fontSize: '0.8rem' }} 
           />
-          <Chip 
+          <styles.CCChip 
             label="tulio@laraigo.com" 
             size="small" 
             variant="outlined"
-            sx={{ fontSize: '0.8rem' }} 
           />
-        </Box>
-         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5, color: 'text.secondary' }}>
-          <Typography variant="caption" sx={{ minWidth: '50px' }}>
+        </styles.EmailCCRow>
+        
+        <styles.EmailCCORow>
+          <styles.FieldLabel variant="caption">
             CCO
-          </Typography>
-          <Chip 
+          </styles.FieldLabel>
+          <styles.CCChip 
             label="soporte@laraigo.com" 
             size="small" 
             variant="outlined"
-            sx={{ fontSize: '0.8rem' }} 
           />
-        </Box>
+        </styles.EmailCCORow>
 
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'baseline', 
-          gap: 1, 
-          pt: 1.5, 
-          borderTop: '1px solid #f0f0f0' 
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: '50px' }}>
+        <styles.SubjectRow>
+          <styles.FieldLabel variant="caption">
             Asunto
-          </Typography>
-          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary', lineHeight: 1.4 }}>
+          </styles.FieldLabel>
+          <styles.SubjectText variant="body1">
             {plantilla.nombre}
-          </Typography>
-        </Box>
-      </Box>
+          </styles.SubjectText>
+        </styles.SubjectRow>
+      </styles.EmailHeader>
 
-      {plantilla.tipo === 'HTML' ? (
-        <iframe
-          ref={iframeRef}
-          title={`preview-${plantilla.id}`}
-          srcDoc={srcDoc}
-          sandbox="allow-same-origin allow-scripts"
-          style={{
-            width: '100%',
-            height: `${height}px`,
-            border: 'none',
-            transition: 'height 0.2s ease',
-          }}
-        />
-      ) : (
-        <Box sx={{ p: 2, overflowY: 'auto', maxHeight: 500 }}>
-          <Typography
-            component="pre"
-            sx={{
-              whiteSpace: 'pre-wrap',
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
-              fontSize: '0.88rem',
-              lineHeight: 1.7,
-              color: '#222',
+      <styles.EmailContent>
+        {plantilla.tipo === 'HTML' ? (
+          <iframe
+            ref={iframeRef}
+            title={`preview-${plantilla.id}`}
+            srcDoc={srcDoc}
+            sandbox="allow-same-origin allow-scripts"
+            style={{
+              ...styles.EmailIframe,
+              height: `${height}px`,
             }}
-          >
-            {plantilla.preview || plantilla.contenido}
-          </Typography>
-        </Box>
-      )}
-    </Box>
+          />
+        ) : (
+          <styles.TextContent>
+            <styles.PlainTextContent component="pre">
+              {plantilla.preview || plantilla.contenido}
+            </styles.PlainTextContent>
+          </styles.TextContent>
+        )}
+      </styles.EmailContent>
+    </styles.EmailContainer>
   );
 };

@@ -1,40 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import {
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  flexRender,
-  createColumnHelper,
-  type ColumnDef,
-  type SortingState,
-  type RowSelectionState,
-} from '@tanstack/react-table';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Box,
-  Checkbox,
-  Button,
-  Typography,
-  TablePagination,
-  TextField,
-  Toolbar,
-  Chip,
-  Alert,
-} from '@mui/material';
-import {
-  Delete as DeleteIcon,
-  DeleteSweep as DeleteSweepIcon,
-  Search as SearchIcon,
-} from '@mui/icons-material';
+import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, getFilteredRowModel, flexRender, createColumnHelper, type ColumnDef, type SortingState, type RowSelectionState } from '@tanstack/react-table';
+import { Table, TableBody, TableCell, TableHead, TableRow, Box, Checkbox, Typography, Alert } from '@mui/material';
+import { Delete as DeleteIcon, DeleteSweep as DeleteSweepIcon, Search as SearchIcon } from '@mui/icons-material';
 import type { ExcelRow } from '../../hooks/useExcelImport';
+import { styles } from '../../styles/components/campaigns/ExcelDataTable.styles';
 
 interface DefaultColumnConfig {
   width: number;
@@ -108,17 +77,9 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
             </Typography>
           ),
           cell: info => (
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                width: '100%'
-              }}
-            >
+            <styles.CellContent>
               {String(info.getValue() || '')}
-            </Typography>
+            </styles.CellContent>
           ),
           size: defaultColumnConfig?.width || 160,
           minSize: defaultColumnConfig?.width || 100,
@@ -192,34 +153,19 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
     : 'auto';
 
   return (
-    <Paper elevation={0} sx={{ 
-      borderRadius: '16px',
-      border: '1px solid rgba(0,0,0,0.1)',
-      overflow: 'hidden'
-    }}>
-      <Toolbar sx={{ 
-        px: 3, 
-        py: 2,
-        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05))',
-        borderBottom: '1px solid rgba(0,0,0,0.1)'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
-          <Typography variant="h6" fontWeight={600}>
+    <styles.StyledPaper elevation={0}>
+      <styles.StyledToolbar>
+        <styles.ToolbarLeft>
+          <styles.DataTitle>
             📊 Datos Importados
-          </Typography>
-          <Chip 
-            label={`${rows.length} registros`} 
-            size="small"
-            sx={{ 
-              background: 'linear-gradient(45deg, #667eea, #764ba2)',
-              color: 'white',
-              fontWeight: 600
-            }}
-          />
-        </Box>
+          </styles.DataTitle>
+          <styles.DataChip>
+            {rows.length} registros
+          </styles.DataChip>
+        </styles.ToolbarLeft>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <TextField
+        <styles.ToolbarRight>
+          <styles.SearchField
             size="small"
             placeholder="Buscar..."
             value={globalFilter}
@@ -227,64 +173,33 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
             InputProps={{
               startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
             }}
-            sx={{ minWidth: 200 }}
           />
           
           {enableRowSelection && selectedRows.length > 0 && (
-            <Button
+            <styles.RemoveButton
               startIcon={<DeleteIcon />}
               onClick={handleRemoveSelected}
-              color="error"
               variant="outlined"
               size="small"
             >
               Eliminar ({selectedRows.length})
-            </Button>
+            </styles.RemoveButton>
           )}
           
           {enableClearAll && (
-            <Button
+            <styles.ClearAllButton
               startIcon={<DeleteSweepIcon />}
               onClick={onClearAll}
-              color="error"
               variant="contained"
               size="small"
-              sx={{
-                background: 'linear-gradient(45deg, #ef4444, #f87171)',
-                '&:hover': {
-                  background: 'linear-gradient(45deg, #dc2626, #ef4444)',
-                }
-              }}
             >
               Limpiar Todo
-            </Button>
+            </styles.ClearAllButton>
           )}
-        </Box>
-      </Toolbar>
+        </styles.ToolbarRight>
+      </styles.StyledToolbar>
 
-      <TableContainer 
-        sx={{ 
-            maxHeight: 600,
-            overflowX: 'auto',
-            '&::-webkit-scrollbar': {
-                height: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-                background: 'rgba(0,0,0,0.05)',
-                borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(107, 88, 227, 0.61)',
-                borderRadius: '4px',
-                '&:hover': {
-                    background: 'rgba(102, 126, 234, 0.93)',
-                },
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-                background: 'rgba(102, 126, 234, 0.91)',
-            },
-        }}
-      >
+      <styles.StyledTableContainer>
         <Table 
           stickyHeader 
           sx={{ 
@@ -296,78 +211,48 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <TableCell
+                  <styles.SortableHeaderCell
                     key={header.id}
+                    sortable={header.column.getCanSort()}
                     sx={{
-                      background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
-                      fontWeight: 600,
-                      cursor: header.column.getCanSort() ? 'pointer' : 'default',
-                      userSelect: 'none',
                       width: header.getSize(),
                       minWidth: header.column.columnDef.minSize,
                       maxWidth: header.column.columnDef.maxSize,
                       position: 'relative',
-                      '&:hover': header.column.getCanSort() ? {
-                        background: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)',
-                      } : {},
                     }}
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <styles.HeaderContent>
+                      <styles.HeaderTitle>
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
                         {header.column.getIsSorted() && (
-                          <Box component="span" sx={{ ml: 1 }}>
+                          <styles.SortIcon>
                             {header.column.getIsSorted() === 'desc' ? '🔽' : '🔼'}
-                          </Box>
+                          </styles.SortIcon>
                         )}
-                      </Box>
-                      
+                      </styles.HeaderTitle>
+
                       {enableColumnResize && header.column.getCanResize() && (
-                        <Box
+                        <styles.ResizeHandle
+                          isResizing={header.column.getIsResizing()}
                           onMouseDown={header.getResizeHandler()}
                           onTouchStart={header.getResizeHandler()}
-                          sx={{
-                            position: 'absolute',
-                            right: 0,
-                            top: 0,
-                            height: '100%',
-                            width: '4px',
-                            background: header.column.getIsResizing() ? '#667eea' : 'transparent',
-                            cursor: 'col-resize',
-                            userSelect: 'none',
-                            touchAction: 'none',
-                            '&:hover': {
-                              background: '#667eea',
-                            },
-                          }}
                         />
                       )}
-                    </Box>
-                  </TableCell>
+                    </styles.HeaderContent>
+                  </styles.SortableHeaderCell>
                 ))}
               </TableRow>
             ))}
           </TableHead>
           <TableBody>
             {table.getRowModel().rows.map(row => (
-              <TableRow
+              <styles.DataRow
                 key={row.id}
                 selected={row.getIsSelected()}
-                sx={{
-                  '&:hover': { 
-                    background: 'rgba(102, 126, 234, 0.04)',
-                  },
-                  '&.Mui-selected': {
-                    background: 'rgba(102, 126, 234, 0.08)',
-                    '&:hover': {
-                      background: 'rgba(102, 126, 234, 0.12)',
-                    }
-                  }
-                }}
               >
                 {row.getVisibleCells().map(cell => (
                   <TableCell 
@@ -381,13 +266,13 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
-              </TableRow>
+              </styles.DataRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </styles.StyledTableContainer>
 
-      <TablePagination
+      <styles.StyledTablePagination
         component="div"
         count={rows.length}
         page={pagination.pageIndex}
@@ -399,11 +284,7 @@ export const ExcelDataTable: React.FC<ExcelDataTableProps> = ({
         labelDisplayedRows={({ from, to, count }) => 
           `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
         }
-        sx={{
-          borderTop: '1px solid rgba(0,0,0,0.1)',
-          background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
-        }}
       />
-    </Paper>
+    </styles.StyledPaper>
   );
 };

@@ -1,5 +1,4 @@
 import { CampaignAdvanced } from './components/CampaignAdvanced';
-import './App.css'
 
 function App() {
   return (
@@ -9,7 +8,6 @@ function App() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Decorative elements */}
       <div style={{
         position: 'absolute',
         top: '10%',
@@ -20,6 +18,7 @@ function App() {
         borderRadius: '50%',
         filter: 'blur(40px)',
       }} />
+      
       <div style={{
         position: 'absolute',
         bottom: '10%',
@@ -36,4 +35,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

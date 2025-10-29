@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { Box, Typography } from '@mui/material';
 import { WhatsAppPreview } from './WhatsAppPreview';
 import { EmailPreview } from './EmailPreview';
 import { SMSPreview } from './SMSPreview';
 import type { PlantillaComunicacion } from '../../types/mockData';
+import { styles } from '../../styles/components/campaigns/MessagePreview.styles';
 
 interface MessagePreviewProps {
   plantilla: PlantillaComunicacion | null;
@@ -23,27 +23,14 @@ export const MessagePreview: React.FC<MessagePreviewProps> = ({ plantilla }) => 
 
   if (!plantilla) {
     return (
-      <Box
-        sx={{
-          p: 4,
-          textAlign: 'center',
-          borderRadius: '16px',
-          background: 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
-          border: '2px dashed rgba(102, 126, 234, 0.3)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 250,
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1, color: '#667eea' }}>
+      <styles.EmptyContainer>
+        <styles.EmptyTitle variant="h6">
           📱 Preview del Mensaje
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
+        </styles.EmptyTitle>
+        <styles.EmptySubtitle variant="body2">
           Selecciona una plantilla para ver el preview
-        </Typography>
-      </Box>
+        </styles.EmptySubtitle>
+      </styles.EmptyContainer>
     );
   }
 
@@ -60,28 +47,14 @@ export const MessagePreview: React.FC<MessagePreviewProps> = ({ plantilla }) => 
 
     default:
       return (
-        <Box
-          sx={{
-            p: 4,
-            textAlign: 'center',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, #fee2e2, #fecaca)',
-            border: '2px dashed rgba(239, 68, 68, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 250,
-            width: '100%',
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 1, color: '#dc2626' }}>
+        <styles.ErrorContainer>
+          <styles.ErrorTitle variant="h6">
             ⚠️ Tipo no soportado
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+          </styles.ErrorTitle>
+          <styles.ErrorSubtitle variant="body2">
             El tipo de plantilla "{plantilla.tipo}" no tiene preview disponible
-          </Typography>
-        </Box>
+          </styles.ErrorSubtitle>
+        </styles.ErrorContainer>
       );
   }
 };

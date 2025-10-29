@@ -1,11 +1,12 @@
 import React, { useRef, useMemo } from 'react';
-import { Box, Typography, Button, Paper, Alert, CircularProgress, Fade } from '@mui/material';
+import { Typography, CircularProgress, Fade } from '@mui/material';
 import { CloudUpload as CloudUploadIcon, Description as DescriptionIcon, People as PeopleIcon, BusinessCenter as BusinessCenterIcon } from '@mui/icons-material';
 import { useCampaignForm } from '../../contexts/CampaignFormContext';
 import { useExcelImport } from '../../hooks/useExcelImport';
 import { ExcelDataTable } from '../tables/ExcelDataTable';
 import { personasMockData, oportunidadesMockData } from '../../data/mockData';
 import { getZodError, hasZodError } from '../../utils/formHelpers';
+import { styles } from '../../styles/components/campaigns/PersonasTab.styles';
 
 export const PersonasTab: React.FC = () => {
   const { formData, updateFormData, errors, showErrors } = useCampaignForm();
@@ -89,72 +90,72 @@ export const PersonasTab: React.FC = () => {
   if (fuente === 'PERSONAS') {
     const tableData = personasTableData;
     return (
-      <Paper elevation={0} sx={{ p: 4, borderRadius: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.3)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2 }}>
+      <styles.PersonasContainer elevation={0}>
+        <styles.TabHeader>
+          <styles.HeaderIconBox gradient="linear-gradient(135deg, #667eea, #764ba2)">
             <PeopleIcon sx={{ color: 'white', fontSize: 24 }} />
-          </Box>
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, background: 'linear-gradient(45deg, #667eea, #764ba2)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          </styles.HeaderIconBox>
+          <div>
+            <styles.HeaderTitle gradient="linear-gradient(45deg, #667eea, #764ba2)">
               Base de Personas
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </styles.HeaderTitle>
+            <styles.HeaderSubtitle>
               {personasMockData.length} personas registradas en el sistema
-            </Typography>
-          </Box>
-        </Box>
+            </styles.HeaderSubtitle>
+          </div>
+        </styles.TabHeader>
         <ExcelDataTable headers={tableData.headers} rows={tableData.rows} defaultColumnConfig={{ width: 140 }} />
-      </Paper>
+      </styles.PersonasContainer>
     );
   }
 
   if (fuente === 'OPORTUNIDADES') {
     const tableData = getOportunidadesTableData;
     return (
-      <Paper elevation={0} sx={{ p: 4, borderRadius: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.3)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #f59e0b, #f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2 }}>
+      <styles.PersonasContainer elevation={0}>
+        <styles.TabHeader>
+          <styles.HeaderIconBox gradient="linear-gradient(135deg, #f59e0b, #f97316)">
             <BusinessCenterIcon sx={{ color: 'white', fontSize: 24 }} />
-          </Box>
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, background: 'linear-gradient(45deg, #f59e0b, #f97316)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          </styles.HeaderIconBox>
+          <div>
+            <styles.HeaderTitle gradient="linear-gradient(45deg, #f59e0b, #f97316)">
               Oportunidades de Negocio
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </styles.HeaderTitle>
+            <styles.HeaderSubtitle>
               {oportunidadesMockData.length} oportunidades activas en el sistema
-            </Typography>
-          </Box>
-        </Box>
+            </styles.HeaderSubtitle>
+          </div>
+        </styles.TabHeader>
         <ExcelDataTable headers={tableData.headers} rows={tableData.rows} defaultColumnConfig={{ width: 140 }} />
-      </Paper>
+      </styles.PersonasContainer>
     );
   }
 
   if (fuente === 'EXTERNA') {
     return (
-      <Paper elevation={0} sx={{ p: 4, borderRadius: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.3)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <Box sx={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #10b981, #34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2 }}>
+      <styles.PersonasContainer elevation={0}>
+        <styles.TabHeader>
+          <styles.HeaderIconBox gradient="linear-gradient(135deg, #10b981, #34d399)">
             <DescriptionIcon sx={{ color: 'white', fontSize: 24 }} />
-          </Box>
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, background: 'linear-gradient(45deg, #10b981, #34d399)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          </styles.HeaderIconBox>
+          <div>
+            <styles.HeaderTitle gradient="linear-gradient(45deg, #10b981, #34d399)">
               Importar Miembros Externos
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            </styles.HeaderTitle>
+            <styles.HeaderSubtitle>
               Carga un archivo Excel con la información de tus contactos
-            </Typography>
-          </Box>
-        </Box>
+            </styles.HeaderSubtitle>
+          </div>
+        </styles.TabHeader>
 
         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".xlsx,.xls" style={{ display: 'none' }} />
 
         {!excelData && (
           <Fade in={true}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, textAlign: 'center' }}>
-              <Box sx={{ width: 120, height: 120, borderRadius: '24px', background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1))', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3, border: '2px dashed rgba(102, 126, 234, 0.3)' }}>
+            <styles.UploadSection>
+              <styles.UploadIconBox>
                 <DescriptionIcon sx={{ fontSize: 48, color: '#667eea' }} />
-              </Box>
+              </styles.UploadIconBox>
 
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 Importa tu archivo Excel
@@ -164,58 +165,62 @@ export const PersonasTab: React.FC = () => {
                 Sube un archivo Excel (.xlsx o .xls) con la información de tus contactos. Si la primera fila contiene "Obligatorio" u "Opcional", será ignorada automáticamente.
               </Typography>
 
-              <Button onClick={handleFileUpload} disabled={isLoading} variant="contained" size="large" startIcon={isLoading ? <CircularProgress size={20} /> : <CloudUploadIcon />} sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white', fontWeight: 600, px: 4, py: 1.5, borderRadius: '12px', textTransform: 'none', fontSize: '1.1rem', '&:hover': { background: 'linear-gradient(45deg, #5a67d8, #6b46c1)', transform: 'translateY(-2px)', boxShadow: '0 8px 16px rgba(102, 126, 234, 0.3)' }, '&:disabled': { background: 'rgba(102, 126, 234, 0.3)' }, transition: 'all 0.3s ease' }}>
+              <styles.UploadButton 
+                onClick={handleFileUpload} 
+                disabled={isLoading} 
+                variant="contained" 
+                size="large" 
+                startIcon={isLoading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+              >
                 {isLoading ? 'Procesando...' : 'Seleccionar Archivo'}
-              </Button>
+              </styles.UploadButton>
 
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2 }}>
                 Formatos soportados: .xlsx, .xls
               </Typography>
-            </Box>
+            </styles.UploadSection>
           </Fade>
         )}
 
         {showErrors && hasZodError(errors, 'personas.hasExcelFile') && (
-          <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }}>
+          <styles.StyledAlert severity="error">
             {getZodError(errors, 'personas.hasExcelFile') || 'Debe cargar un archivo Excel cuando la fuente es Externa'}
-          </Alert>
+          </styles.StyledAlert>
         )}
 
         {error && (
-          <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }}>
+          <styles.StyledAlert severity="error">
             {error}
-          </Alert>
+          </styles.StyledAlert>
         )}
 
         {excelData && (
           <Fade in={true}>
-            <Box sx={{ mt: 3 }}>
+            <styles.DataTableContainer>
               <ExcelDataTable headers={excelData.headers} rows={excelData.rows} onRemoveRows={removeRows} onClearAll={() => { clearData(); }} />
-            </Box>
+            </styles.DataTableContainer>
           </Fade>
         )}
-      </Paper>
+      </styles.PersonasContainer>
     );
   }
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.3)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <Box sx={{ width: 48, height: 48, borderRadius: '16px', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2, fontSize: '1.5rem' }}>
-          👥
-        </Box>
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, background: 'linear-gradient(45deg, #667eea, #764ba2)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+    <styles.PersonasContainer elevation={0}>
+      <styles.TabHeader>
+        <styles.EmojiBox>👥</styles.EmojiBox>
+        <div>
+          <styles.HeaderTitle gradient="linear-gradient(45deg, #667eea, #764ba2)">
             Audiencia y Personas
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+          </styles.HeaderTitle>
+          <styles.HeaderSubtitle>
             Selecciona una fuente en la configuración general
-          </Typography>
-        </Box>
-      </Box>
-      <Alert severity="info" sx={{ borderRadius: '12px' }}>
+          </styles.HeaderSubtitle>
+        </div>
+      </styles.TabHeader>
+      <styles.StyledAlert severity="info">
         Selecciona una fuente de datos en el tab "General" para ver las opciones disponibles.
-      </Alert>
-    </Paper>
+      </styles.StyledAlert>
+    </styles.PersonasContainer>
   );
 };
